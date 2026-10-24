@@ -1,0 +1,1118 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#4338ca">
+<link rel="icon" href="icon-192.png">
+<title>Método Procuradoria</title>
+<style>
+:root{--bg:#f4f5f9;--card:#fff;--text:#1c2033;--muted:#6b7190;--border:#e3e6f0;--primary:#4338ca;--primary-soft:#e8e7fb;--green:#16a34a;--yellow:#d97706;--red:#dc2626;--blue:#2563eb;--side:#171a2e;--side-text:#aeb4d6;--shadow:0 1px 3px rgba(20,24,60,.08),0 4px 14px rgba(20,24,60,.05)}
+:root[data-theme=dark]{--bg:#0f111c;--card:#1a1d2e;--text:#e8eaf6;--muted:#8d93b5;--border:#2a2e47;--primary:#818cf8;--primary-soft:#26294a;--side:#0a0c15;--shadow:0 1px 3px rgba(0,0,0,.4)}
+*{box-sizing:border-box}
+body{margin:0;font-family:Inter,"Segoe UI",system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);font-size:14px;line-height:1.45}
+.shell{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+aside.side{background:var(--side);color:var(--side-text);padding:18px 12px;position:sticky;top:0;height:100vh;overflow:auto}
+.brand{color:#fff;font-weight:700;font-size:16px;padding:6px 10px 18px;display:flex;gap:8px;align-items:center}
+.brand small{display:block;font-weight:400;color:var(--side-text);font-size:11px}
+#nav a{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;cursor:pointer;color:var(--side-text);margin-bottom:2px;user-select:none}
+#nav a:hover{background:rgba(255,255,255,.06);color:#fff}
+#nav a.on{background:var(--primary);color:#fff}
+#nav .nb{margin-left:auto;background:var(--red);color:#fff;border-radius:99px;font-size:11px;padding:1px 7px}
+.content{min-width:0}
+.top{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--border);padding:10px 24px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.top h1{font-size:18px;margin:0;flex:1}
+main{padding:22px 24px 60px;max-width:1280px}
+.btn{border:1px solid var(--border);background:var(--card);color:var(--text);padding:7px 13px;border-radius:9px;cursor:pointer;font-size:13px;font-weight:500;font-family:inherit}
+.btn:hover{border-color:var(--primary)}
+.btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.btn.danger{color:var(--red)}
+.btn.ghost{background:transparent}
+.btn.sm{padding:3px 9px;font-size:12px}
+.btn.g{background:var(--green);border-color:var(--green);color:#fff}
+.btn.y{background:var(--yellow);border-color:var(--yellow);color:#fff}
+.btn.r{background:var(--red);border-color:var(--red);color:#fff}
+.btn.sel{outline:3px solid var(--primary);outline-offset:1px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
+.card h3{margin:0 0 10px;font-size:14px}
+.card h3 small{color:var(--muted);font-weight:400}
+.grid{display:grid;gap:14px;margin-bottom:14px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}.g21{grid-template-columns:2fr 1fr}
+@media(max-width:1000px){.g4,.g3,.g21{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){.shell{grid-template-columns:1fr}aside.side{position:static;height:auto}#nav{display:flex;flex-wrap:wrap}.g2,.g3,.g4,.g21{grid-template-columns:1fr}main{padding:14px}}
+.kpi .l{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.kpi .v{font-size:28px;font-weight:700;margin:4px 0 2px}
+.kpi .s{font-size:12px;color:var(--muted)}
+.good{color:var(--green)}.warn{color:var(--yellow)}.bad{color:var(--red)}
+.badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;background:var(--primary-soft);color:var(--primary);white-space:nowrap}
+.badge.g{background:#dcfce7;color:#15803d}.badge.y{background:#fef3c7;color:#b45309}.badge.r{background:#fee2e2;color:#b91c1c}.badge.b{background:#dbeafe;color:#1d4ed8}.badge.m{background:var(--border);color:var(--muted)}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);padding:8px;border-bottom:1px solid var(--border)}
+td{padding:9px 8px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+.tw{overflow:auto}
+input,select,textarea{font:inherit;color:var(--text);background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:7px 10px;width:100%}
+textarea{resize:vertical;min-height:70px}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--primary);outline-offset:-1px}
+label{display:block;font-size:12px;color:var(--muted);margin:10px 0 3px;font-weight:600}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.row>*{flex:1;min-width:130px}
+.row>.auto{flex:none;min-width:0}
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.filters select,.filters input{width:auto;min-width:150px}
+.muted{color:var(--muted)}.small{font-size:12px}
+.bar{height:10px;background:var(--border);border-radius:99px;position:relative;overflow:visible}
+.bar i{display:block;height:100%;border-radius:99px;background:var(--primary)}
+.bar b{position:absolute;top:-3px;width:2px;height:16px;background:var(--text);opacity:.6}
+.brow{display:grid;grid-template-columns:150px 1fr 56px;gap:10px;align-items:center;margin:9px 0}
+.chart{width:100%;height:auto;display:block}
+.chart text{fill:var(--muted);font-size:11px}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;margin-top:6px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px}
+.empty{padding:26px;text-align:center;color:var(--muted);border:1px dashed var(--border);border-radius:12px}
+.item{display:flex;gap:12px;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)}
+.item:last-child{border-bottom:0}
+.item .grow{flex:1;min-width:0}
+.item .t{font-weight:600}
+.tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.tabs a{padding:4px 11px;border-radius:99px;border:1px solid var(--border);cursor:pointer;font-size:12px}
+.tabs a.on{background:var(--primary);color:#fff;border-color:var(--primary)}
+.check{display:flex;gap:9px;align-items:center;padding:6px 0;cursor:pointer}
+.check input{width:18px;height:18px}
+#modal{position:fixed;inset:0;background:rgba(10,12,30,.55);display:none;align-items:flex-start;justify-content:center;z-index:50;padding:30px 14px;overflow:auto}
+#modal.on{display:flex}
+.mbox{background:var(--card);border-radius:16px;width:100%;max-width:640px;padding:20px;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.mbox.wide{max-width:900px}
+.mbox h2{margin:0 0 6px;font-size:17px}
+.mfoot{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.cedit{border:1px solid var(--border);border-radius:12px;padding:12px;margin:10px 0;background:var(--bg)}
+.cedit .h{display:flex;gap:8px;align-items:center;justify-content:space-between}
+#toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;padding:10px 18px;border-radius:10px;z-index:99;display:none}
+#exam{position:fixed;inset:0;background:var(--bg);z-index:40;display:none;flex-direction:column}
+#exam.on{display:flex}
+.ex-top{background:#111322;color:#fff;padding:12px 22px;display:flex;gap:16px;align-items:center}
+.ex-top b{flex:1}
+#exTimer{font-variant-numeric:tabular-nums;font-size:18px;font-weight:700;background:#262a48;padding:4px 12px;border-radius:8px}
+.ex-body{flex:1;display:grid;grid-template-columns:200px 1fr;min-height:0}
+.ex-nav{background:var(--card);border-right:1px solid var(--border);padding:14px;overflow:auto}
+.ex-nav .grid2{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.qn{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:8px;border:2px solid var(--border);cursor:pointer;font-weight:600;font-size:13px}
+.qn.done{background:var(--primary-soft);border-color:var(--primary);color:var(--primary)}
+.qn.cur{outline:3px solid var(--primary)}
+.qn.flag{border-color:var(--yellow)}
+.qn.mg{background:var(--green);color:#fff;border-color:var(--green)}.qn.my{background:var(--yellow);color:#fff;border-color:var(--yellow)}.qn.mr{background:var(--red);color:#fff;border-color:var(--red)}
+.ex-main{padding:24px 34px;overflow:auto}
+.ex-q{font-size:18px;font-weight:600;white-space:pre-wrap;margin:10px 0 16px;line-height:1.5}
+.ex-main textarea{min-height:300px;font-size:15px;line-height:1.6}
+.pre{white-space:pre-wrap;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px;min-height:90px}
+@media(max-width:760px){.ex-body{grid-template-columns:1fr}.ex-nav{border-right:0;border-bottom:1px solid var(--border)}.ex-main{padding:16px}}
+.banner{background:#fef3c7;color:#92400e;border-radius:12px;padding:10px 14px;margin-bottom:14px;display:flex;gap:10px;align-items:center}
+.hero{background:linear-gradient(135deg,#4338ca,#7c3aed);color:#fff;border-radius:16px;padding:22px;margin-bottom:14px}
+.hero h2{margin:0 0 6px}
+.method pre{white-space:pre-wrap;font-family:inherit;margin:0}
+.cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.cal-dow{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);text-align:center;padding:2px 0}
+.cal-cell{min-height:96px;border:1px solid var(--border);background:var(--bg);border-radius:10px;padding:5px 6px;cursor:pointer;overflow:hidden}
+.cal-cell:hover{border-color:var(--primary)}
+.cal-cell.out{opacity:.45}
+.cal-cell.today{border-color:var(--primary);box-shadow:0 0 0 2px var(--primary-soft);background:var(--card)}
+.cal-cell.sel{outline:2px solid var(--primary);outline-offset:-1px}
+.cal-n{font-weight:700;font-size:12px;margin-bottom:2px}
+.chip{display:inline-block;font-size:11px;line-height:16px;border-radius:6px;padding:0 5px;margin:1px 2px 0 0;background:var(--primary-soft);color:var(--primary);white-space:nowrap}
+.chip.r{background:#fee2e2;color:#b91c1c}.chip.g{background:#dcfce7;color:#15803d}.chip.y{background:#fef3c7;color:#b45309}.chip.b{background:#dbeafe;color:#1d4ed8}
+.cal-ev{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:var(--primary);color:#fff;border-radius:5px;padding:0 5px;margin-top:2px}
+.cal-ev.done{opacity:.5;text-decoration:line-through}
+@media(max-width:760px){.cal-cell{min-height:64px;padding:3px}.cal-grid{gap:3px}.chip{font-size:10px;padding:0 3px}}
+#drBanner:not(:empty){padding:14px 24px 0;max-width:1280px}@media(max-width:760px){#drBanner:not(:empty){padding:12px 14px 0}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="side">
+    <div class="brand">⚖️ <div>Método Procuradoria<small>Sistema de estudo local</small></div></div>
+    <nav id="nav"></nav>
+  </aside>
+  <div class="content">
+    <div class="top"><h1 id="title"></h1><span id="timerChip"></span><span id="syncChip"></span><button class="btn" data-act="quickLog">+ Questões</button><button class="btn primary" data-act="newTopic">+ Assunto</button><button class="btn ghost" data-act="theme" title="Alternar tema">🌓</button></div>
+    <div id="drBanner"></div>
+    <main id="main"></main>
+  </div>
+</div>
+<div id="modal"></div>
+<div id="exam"></div>
+<div id="toast"></div>
+
+<script>
+'use strict';
+/* ============ utilidades ============ */
+const $=(s,r=document)=>r.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad=n=>String(n).padStart(2,'0');
+const fmtISO=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const today=()=>fmtISO(new Date());
+const parse=s=>{const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d,12)};
+const addDays=(s,n)=>{const d=parse(s);d.setDate(d.getDate()+n);return fmtISO(d)};
+const diffDays=(a,b)=>Math.round((parse(a)-parse(b))/864e5);
+const br=s=>s?s.split('-').reverse().join('/'):'—';
+const brShort=s=>s?s.slice(8)+'/'+s.slice(5,7):'';
+const pct=(a,t)=>t?Math.round(a/t*1000)/10:null;
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const fmtH=min=>{const h=Math.floor(min/60),m=Math.round(min%60);return h+'h'+pad(m)};
+const toast=m=>{const t=$('#toast');t.textContent=m;t.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>t.style.display='none',2600)};
+
+/* ============ estado ============ */
+const KEY='metodo-procuradoria-v1';
+const NIVEIS=[15,30,45,60,90,180];
+function fresh(){return{v:1,settings:{stage:1,meta:85,amostra:100,horasSemana:25,tema:'auto',nome:''},
+ disciplinas:[['Constitucional',1],['Administrativo',1],['Tributário',1],['Processo Civil',1],['Financeiro',1],['Civil',2],['Trabalho',2],['Processo do Trabalho',2],['Ambiental',3],['Previdenciário',3],['Urbanístico',3]].map(([n,e])=>({n,e})),
+ topics:[],logs:[],erros:[],sessoes:[],simulados:[],treinos:[],leituras:[],eventos:[],checks:{},timer:null,exam:null,lastBackup:''}}
+function migrate(o){const f=fresh();const s=Object.assign(f,o);s.settings=Object.assign(f.settings,o.settings||{});return s}
+let S=(()=>{try{const r=localStorage.getItem(KEY);if(r)return migrate(JSON.parse(r))}catch(e){}return fresh()})();
+let saveFail=false;
+function save(){S.savedAt=Date.now();track();try{localStorage.setItem(KEY,JSON.stringify(S));saveFail=false}catch(e){if(!saveFail)toast('⚠ Não consegui salvar no navegador. Exporte um backup!');saveFail=true}fsSchedule();driveSchedule()}
+const UI={view:'dashboard',f:{},cal:{m:today().slice(0,7),sel:today()}};
+const F=k=>UI.f[k]||'';
+const escOf=d=>{const x=S.disciplinas.find(z=>z.n===d);return x?x.e:0};
+const discNames=()=>S.disciplinas.map(d=>d.n);
+const nomeEsc={1:'Núcleo duro',2:'2º escalão',3:'3º escalão'};
+
+/* ============ regras do método ============ */
+function nextState(c,m){
+  const cur=c.nivel;let v=c.verdes||0,nv;
+  if(m==='x'){nv=15;v=0}
+  else if(cur===15){if(m==='g'){nv=60;v=1}else if(m==='y'){nv=45;v=0}else{nv=15;v=0}}
+  else if(m==='g'){v++;nv=(v>=3||cur===180)?180:90}
+  else if(m==='y'){nv=60;v=0}
+  else{nv=30;v=0}
+  return{nv,v,prox:addDays(today(),nv)};
+}
+function applyMark(c,m){const n=nextState(c,m);(c.hist=c.hist||[]).push({d:today(),r:m,de:c.nivel,para:n.nv});c.nivel=n.nv;c.verdes=n.v;c.ultima=today();c.prox=n.prox}
+function newCard(o={}){return Object.assign({id:uid(),tipo:'conhecimento',q:'',a:'',nivel:30,prox:'',ultima:'',verdes:0,hist:[],ativo:true},o)}
+function prio(x){const o=Math.max(0,diffDays(today(),x.c.prox));const e=escOf(x.t.disc);return o*2+(e===1?3:e===2?2:1)+(x.c.nivel<=30?2:0)+(x.c.nivel===15?4:0)}
+function allCards(){const r=[];S.topics.forEach(t=>{if(t.status==='estudado')t.cards.forEach(c=>{if(c.ativo!==false)r.push({t,c})})});return r}
+function dueCards(date){date=date||today();return allCards().filter(x=>x.c.prox&&x.c.prox<=date).sort((a,b)=>prio(b)-prio(a))}
+function findCard(id){for(const t of S.topics){const c=t.cards.find(x=>x.id===id);if(c)return{t,c}}return null}
+const consolidado=c=>c.nivel===180&&(c.verdes||0)>=3;
+
+/* ============ estatísticas ============ */
+function logsFiltered(f={}){return S.logs.filter(l=>(!f.esc||escOf(l.disc)===f.esc)&&(!f.disc||l.disc===f.disc)).sort((a,b)=>a.data.localeCompare(b.data)||(a.ts||0)-(b.ts||0))}
+function rollingEnd(list,end,N){let t=0,a=0;for(let i=end;i>=0;i--){t+=list[i].total;a+=list[i].acertos;if(t>=N)break}return{tot:t,ac:a,p:pct(a,t)}}
+const rolling=(list,N)=>list.length?rollingEnd(list,list.length-1,N):{tot:0,ac:0,p:null};
+function evolSeries(f,N){const list=logsFiltered(f);const byDay={};list.forEach((l,i)=>{byDay[l.data]=rollingEnd(list,i,N)});return Object.entries(byDay).map(([x,r])=>({x,y:r.p,tot:r.tot}))}
+function stageStatus(){const N=S.settings.amostra,m=S.settings.meta;const r1=rolling(logsFiltered({esc:1}),N),r2=rolling(logsFiltered({esc:2}),N),r3=rolling(logsFiltered({esc:3}),N),all=rolling(logsFiltered({}),N);
+  const ok=r=>r.p!=null&&r.p>=m&&r.tot>=N;const st=S.settings.stage;
+  let ready=false,txt='';
+  if(st===1){ready=ok(r1);txt='Meta para avançar ao Estágio 2: '+m+'% no núcleo duro em ≥'+N+' questões.'}
+  else if(st===2){ready=ok(r2)&&ok(r1);txt='Meta para avançar ao Estágio 3: '+m+'% no 2º escalão + manutenção de '+m+'% no núcleo.'}
+  else{ready=ok(all);txt='Meta: '+m+'% considerando os três escalões.'}
+  return{r1,r2,r3,all,ready,txt,st}}
+function sumMin(from,to){return S.sessoes.filter(s=>s.data>=from&&s.data<=to).reduce((a,s)=>a+s.min,0)}
+function activityDates(){const d=new Set();S.sessoes.forEach(s=>d.add(s.data));S.logs.forEach(s=>d.add(s.data));S.erros.forEach(s=>d.add(s.data));S.topics.forEach(t=>{if(t.estudo)d.add(t.estudo);t.cards.forEach(c=>(c.hist||[]).forEach(h=>d.add(h.d)))});return d}
+function streak(){const d=activityDates();let day=today();if(!d.has(day))day=addDays(day,-1);let n=0;while(d.has(day)){n++;day=addDays(day,-1)}return n}
+const cls=p=>p==null?'':p>=S.settings.meta?'good':p>=S.settings.meta-10?'warn':'bad';
+
+/* ============ gráficos (SVG sem dependências) ============ */
+function emptyBox(t){return'<div class="empty">'+esc(t)+'</div>'}
+function lineChart(series,o={}){
+  series=series.filter(s=>s.pts.length);if(!series.length)return emptyBox('Sem dados ainda — registre questões para ver a evolução.');
+  const W=720,H=o.h||240,L=36,R=14,T=12,B=26;
+  const xs=[...new Set(series.flatMap(s=>s.pts.map(p=>p.x)))].sort();
+  const t0=parse(xs[0]).getTime(),t1=parse(xs[xs.length-1]).getTime();
+  const X=x=>xs.length===1||t1===t0?L+(W-L-R)/2:L+(parse(x).getTime()-t0)/(t1-t0)*(W-L-R);
+  const Y=y=>T+(1-y/100)*(H-T-B);
+  let g='';[0,20,40,60,80,100].forEach(v=>{g+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(v)+'" y2="'+Y(v)+'" stroke="var(--border)"/><text x="'+(L-6)+'" y="'+(Y(v)+4)+'" text-anchor="end">'+v+'</text>'});
+  if(o.meta!=null)g+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(o.meta)+'" y2="'+Y(o.meta)+'" stroke="var(--red)" stroke-dasharray="5 4"/><text x="'+(W-R)+'" y="'+(Y(o.meta)-5)+'" text-anchor="end" style="fill:var(--red)">meta '+o.meta+'%</text>';
+  const lab=[xs[0],xs[Math.floor(xs.length/2)],xs[xs.length-1]];[...new Set(lab)].forEach(x=>{g+='<text x="'+X(x)+'" y="'+(H-6)+'" text-anchor="middle">'+brShort(x)+'</text>'});
+  series.forEach(s=>{const pts=s.pts.map(p=>X(p.x)+','+Y(p.y)).join(' ');g+='<polyline fill="none" stroke="'+s.color+'" stroke-width="2.4" '+(s.dash?'stroke-dasharray="6 4"':'')+' points="'+pts+'"/>';s.pts.forEach(p=>{g+='<circle cx="'+X(p.x)+'" cy="'+Y(p.y)+'" r="3.4" fill="'+s.color+'"><title>'+esc(s.name)+' · '+br(p.x)+' · '+p.y+'%'+(p.tot?' ('+p.tot+' q.)':'')+'</title></circle>'})});
+  const leg='<div class="legend">'+series.map(s=>'<span><i style="background:'+s.color+'"></i>'+esc(s.name)+'</span>').join('')+'</div>';
+  return'<svg class="chart" viewBox="0 0 '+W+' '+H+'">'+g+'</svg>'+leg;
+}
+function barChart(items,o={}){
+  if(!items.length)return emptyBox('Sem dados.');
+  const W=720,H=o.h||190,L=30,R=8,T=18,B=24;const max=Math.max(o.max||0,...items.map(i=>i.v),1);
+  const bw=(W-L-R)/items.length;let g='';
+  [0,.5,1].forEach(f=>{const y=T+(1-f)*(H-T-B);g+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y+'" y2="'+y+'" stroke="var(--border)"/><text x="'+(L-5)+'" y="'+(y+4)+'" text-anchor="end">'+(Math.round(max*f*10)/10)+'</text>'});
+  if(o.ref!=null){const y=T+(1-o.ref/max)*(H-T-B);g+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+y+'" y2="'+y+'" stroke="var(--red)" stroke-dasharray="5 4"/>'}
+  items.forEach((it,i)=>{const h=it.v/max*(H-T-B),x=L+i*bw+bw*.18,w=bw*.64,y=T+(H-T-B)-h;g+='<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+Math.max(h,it.v?2:0)+'" rx="4" fill="'+(it.c||o.color||'var(--primary)')+'"><title>'+esc(it.l)+': '+(it.t||it.v)+'</title></rect>';if(it.v)g+='<text x="'+(x+w/2)+'" y="'+(y-4)+'" text-anchor="middle" style="fill:var(--text)">'+(it.t||it.v)+'</text>';if(items.length<=16||i%2===0)g+='<text x="'+(x+w/2)+'" y="'+(H-7)+'" text-anchor="middle">'+esc(it.l)+'</text>'});
+  return'<svg class="chart" viewBox="0 0 '+W+' '+H+'">'+g+'</svg>';
+}
+function progBar(p,meta,color){const w=p==null?0:Math.min(100,p);return'<div class="bar"><i style="width:'+w+'%;background:'+(color||'var(--primary)')+'"></i><b style="left:'+meta+'%"></b></div>'}
+
+/* ============ componentes ============ */
+const kpi=(l,v,s,c)=>'<div class="card kpi"><div class="l">'+l+'</div><div class="v '+(c||'')+'">'+v+'</div><div class="s">'+(s||'')+'</div></div>';
+const opts=(list,val,all)=>(all!=null?'<option value="">'+all+'</option>':'')+list.map(x=>{const v=Array.isArray(x)?x[0]:x,l=Array.isArray(x)?x[1]:x;return'<option value="'+esc(v)+'"'+(String(v)===String(val)?' selected':'')+'>'+esc(l)+'</option>'}).join('');
+const fsel=(k,list,all)=>'<select data-filter="'+k+'">'+opts(list,F(k),all)+'</select>';
+const nivBadge=c=>{const cl=c.nivel===15?'r':c.nivel===30?'y':c.nivel>=90?'g':'b';return'<span class="badge '+cl+'">AR'+c.nivel+'</span>'};
+const topicNext=t=>{const p=t.cards.filter(c=>c.ativo!==false&&c.prox).map(c=>c.prox).sort();return p[0]||''};
+const escOpts=[[1,'Núcleo duro'],[2,'2º escalão'],[3,'3º escalão']];
+
+/* ============ modais ============ */
+function openModal(html,wide){$('#modal').innerHTML='<div class="mbox'+(wide?' wide':'')+'">'+html+'</div>';$('#modal').classList.add('on')}
+function closeModal(){$('#modal').classList.remove('on');$('#modal').innerHTML=''}
+$('#modal').addEventListener('mousedown',e=>{if(e.target.id==='modal'&&!e.target.dataset.keep)closeModal()});
+
+/* ---- assunto / conteúdo ---- */
+const GAB='Conceito/regra: \nFundamento legal: \nJurisprudência (STF/STJ): \nExceção/distinção: \nAplicação prática: ';
+function cardEditHtml(c){return'<div class="cedit" data-id="'+c.id+'" data-nivel="'+c.nivel+'" data-verdes="'+(c.verdes||0)+'" data-ultima="'+esc(c.ultima||'')+'"><div class="h"><b class="small">Pergunta</b><span><select class="ctipo" style="width:auto"><option value="conhecimento"'+(c.tipo==='conhecimento'?' selected':'')+'>Conhecimento</option><option value="procurador"'+(c.tipo==='procurador'?' selected':'')+'>Advogado público</option></select> <button type="button" class="btn sm danger" data-act="rmCard">remover</button></span></div><textarea class="cq" placeholder="Pergunta de examinador…">'+esc(c.q)+'</textarea><label>Resposta-modelo (regra → fundamento → jurisprudência → exceção → aplicação) <a href="#" data-act="gab" style="font-weight:400">inserir estrutura</a></label><textarea class="ca" style="min-height:110px">'+esc(c.a)+'</textarea>'+(c.hist&&c.hist.length||c.prox?'<div class="row" style="margin-top:6px"><div><label>Nível</label><select class="cniv">'+opts(NIVEIS.map(n=>[n,'AR'+n]),c.nivel)+'</select></div><div><label>Próxima revisão</label><input type="date" class="cprox" value="'+esc(c.prox||'')+'"></div><div class="auto small muted">'+(c.hist||[]).length+' revisões · '+(c.verdes||0)+' verdes seguidos</div></div>':'<input type="hidden" class="cniv" value="'+c.nivel+'"><input type="hidden" class="cprox" value="">')+'</div>'}
+function openTopic(id,preset){
+  const t=id?S.topics.find(x=>x.id===id):Object.assign({id:'',disc:discNames()[0],assunto:'',status:'planejado',previsto:'',estudo:'',notas:'',cards:[]},preset||{});
+  const cards=t.cards.length?t.cards:[newCard()];
+  openModal('<h2>'+(id?'Editar assunto':'Novo assunto')+'</h2><form data-submit="saveTopic"><input type="hidden" name="id" value="'+esc(t.id)+'">'+
+  '<div class="row"><div><label>Disciplina</label><select name="disc">'+opts(discNames(),t.disc)+'</select></div><div style="flex:2"><label>Assunto</label><input name="assunto" value="'+esc(t.assunto)+'" placeholder="Ex.: Poder de polícia" required></div></div>'+
+  '<div class="row"><div><label>Situação</label><select name="status"><option value="planejado"'+(t.status==='planejado'?' selected':'')+'>Planejado (ainda não estudei)</option><option value="estudado"'+(t.status==='estudado'?' selected':'')+'>Estudado</option></select></div><div><label>Previsto para</label><input type="date" name="previsto" value="'+esc(t.previsto||'')+'"></div><div><label>Data do estudo (D0)</label><input type="date" name="estudo" value="'+esc(t.estudo||'')+'"></div></div>'+
+  '<label>Notas</label><textarea name="notas" style="min-height:50px">'+esc(t.notas||'')+'</textarea>'+
+  '<h3 style="margin:16px 0 0">Perguntas do AR</h3><div id="cardsBox">'+cards.map(cardEditHtml).join('')+'</div>'+
+  '<div class="row" style="margin-top:6px"><button type="button" class="btn auto" data-act="addCardEdit">+ Pergunta</button><button type="button" class="btn auto ghost" data-act="toggleBulk">Colar em lote</button></div>'+
+  '<div id="bulk" style="display:none"><label>Formato: linhas começando com P: (pergunta) e R: (resposta); respostas podem ter várias linhas</label><textarea id="bulkTxt" style="min-height:120px" placeholder="P: Conceitue poder de polícia.\nR: ...\nP: Diferencie polícia administrativa de judiciária.\nR: ..."></textarea><button type="button" class="btn sm" data-act="bulkAdd" style="margin-top:6px">Adicionar ao assunto</button></div>'+
+  '<div class="mfoot"><button type="button" class="btn" data-act="closeModal">Cancelar</button><button class="btn primary">Salvar</button></div></form>',true);
+}
+function saveTopic(form){
+  const fd=new FormData(form);const id=fd.get('id');
+  const assunto=String(fd.get('assunto')).trim();if(!assunto){toast('Informe o assunto');return}
+  let t=id?S.topics.find(x=>x.id===id):null;const isNew=!t;if(isNew)t={id:uid(),cards:[],criado:today()};
+  const old=t.status;
+  t.disc=fd.get('disc');t.assunto=assunto;t.status=fd.get('status');t.previsto=fd.get('previsto')||'';t.estudo=fd.get('estudo')||'';t.notas=fd.get('notas')||'';
+  if(t.status==='estudado'){if(!t.estudo)t.estudo=today();if(old!=='estudado'){t.d2Date=addDays(t.estudo,2);t.d2Done=false}}
+  const oldCards=t.cards;const cards=[];
+  form.querySelectorAll('.cedit').forEach(el=>{const q=el.querySelector('.cq').value.trim(),a=el.querySelector('.ca').value.trim();if(!q&&!a)return;
+    const prev=oldCards.find(x=>x.id===el.dataset.id)||newCard({id:el.dataset.id});
+    prev.tipo=el.querySelector('.ctipo').value;prev.q=q;prev.a=a;prev.nivel=Number(el.querySelector('.cniv').value)||30;prev.prox=el.querySelector('.cprox').value||'';
+    if(t.status==='estudado'&&!prev.prox)prev.prox=addDays(t.estudo,prev.nivel);
+    if(t.status!=='estudado'&&!(prev.hist&&prev.hist.length))prev.prox='';
+    cards.push(prev)});
+  t.cards=cards;if(isNew)S.topics.push(t);save();closeModal();render();toast('Assunto salvo');
+}
+function parseBulk(txt){const out=[];let cur=null,mode='';txt.split('\n').forEach(l=>{if(/^\s*P\s*:/i.test(l)){cur={q:l.replace(/^\s*P\s*:/i,'').trim(),a:''};out.push(cur);mode='q'}else if(/^\s*R\s*:/i.test(l)&&cur){cur.a=l.replace(/^\s*R\s*:/i,'').trim();mode='a'}else if(cur){if(mode==='a')cur.a+='\n'+l;else cur.q+='\n'+l}});out.forEach(o=>{o.q=o.q.trim();o.a=o.a.trim()});return out.filter(o=>o.q)}
+
+/* ---- registrar questões objetivas ---- */
+function openLog(o={}){
+  const as=[...new Set(S.topics.map(t=>t.assunto))];
+  openModal('<h2>Registrar questões objetivas</h2><form data-submit="saveLog"><input type="hidden" name="topicId" value="'+esc(o.topicId||'')+'">'+
+  '<div class="row"><div><label>Data</label><input type="date" name="data" value="'+today()+'"></div><div><label>Disciplina</label><select name="disc">'+opts(discNames(),o.disc||discNames()[0])+'</select></div></div>'+
+  '<div class="row"><div style="flex:2"><label>Assunto</label><input name="assunto" list="dl-as" value="'+esc(o.assunto||'')+'"><datalist id="dl-as">'+as.map(a=>'<option value="'+esc(a)+'">').join('')+'</datalist></div><div><label>Origem</label><select name="origem">'+opts(['Questões D+2','Pós-revisão','Avulso'],o.origem||'Avulso')+'</select></div></div>'+
+  '<div class="row"><div><label>Total de questões</label><input type="number" min="1" name="total" required></div><div><label>Acertos</label><input type="number" min="0" name="acertos" required></div></div>'+
+  '<label>IDs das questões erradas (uma por linha — opcional, cria itens no caderno de erros)</label><textarea name="ids" style="min-height:60px" placeholder="Q123456 — Responsabilidade civil"></textarea>'+
+  '<div class="mfoot"><button type="button" class="btn" data-act="closeModal">Cancelar</button><button class="btn primary">Salvar</button></div></form>');
+}
+function saveLog(form){
+  const fd=new FormData(form);const total=Number(fd.get('total')),ac=Number(fd.get('acertos'));
+  if(!total||ac<0||ac>total){toast('Confira total e acertos');return}
+  const disc=fd.get('disc'),assunto=String(fd.get('assunto')).trim()||'(geral)';
+  S.logs.push({id:uid(),ts:Date.now(),data:fd.get('data')||today(),disc,assunto,total,acertos:ac,origem:fd.get('origem')});
+  String(fd.get('ids')).split('\n').map(x=>x.trim()).filter(Boolean).forEach(l=>S.erros.push({id:uid(),qid:l,disc,assunto,data:fd.get('data')||today(),status:'pendente',marcada:'',certa:'',logica:'',premissa:'',regra:'',gatilho:''}));
+  const tid=fd.get('topicId');if(tid){const t=S.topics.find(x=>x.id===tid);if(t)t.d2Done=true}
+  save();closeModal();render();toast('Registrado: '+ac+'/'+total+' ('+pct(ac,total)+'%)');
+}
+
+/* ---- caderno de erros ---- */
+function openErro(id){
+  const e=id?S.erros.find(x=>x.id===id):{id:'',qid:'',disc:discNames()[0],assunto:'',data:today(),status:'pendente',marcada:'',certa:'',logica:'',premissa:'',regra:'',gatilho:''};
+  const as=[...new Set(S.topics.map(t=>t.assunto))];
+  openModal('<h2>'+(id?'Autópsia do erro':'Registrar erro')+'</h2><p class="muted small" style="margin:0">Pergunta-chave: <b>por que eu pensei errado?</b> — e não apenas qual era a alternativa certa.</p><form data-submit="saveErro"><input type="hidden" name="id" value="'+esc(e.id)+'">'+
+  '<div class="row"><div><label>ID da questão</label><input name="qid" value="'+esc(e.qid)+'" required></div><div><label>Data</label><input type="date" name="data" value="'+esc(e.data)+'"></div><div><label>Disciplina</label><select name="disc">'+opts(discNames(),e.disc)+'</select></div></div>'+
+  '<div class="row"><div style="flex:2"><label>Assunto</label><input name="assunto" list="dl-as2" value="'+esc(e.assunto)+'"><datalist id="dl-as2">'+as.map(a=>'<option value="'+esc(a)+'">').join('')+'</datalist></div><div><label>Marquei</label><input name="marcada" value="'+esc(e.marcada)+'"></div><div><label>Era</label><input name="certa" value="'+esc(e.certa)+'"></div></div>'+
+  '<label>1. Recuperei a questão sem olhar a explicação? Qual foi minha lógica?</label><textarea name="logica">'+esc(e.logica)+'</textarea>'+
+  '<label>2. Qual premissa estava equivocada?</label><textarea name="premissa">'+esc(e.premissa)+'</textarea>'+
+  '<label>3. Regra correta</label><textarea name="regra">'+esc(e.regra)+'</textarea>'+
+  '<label>4. Como reconhecer esse erro no futuro? (gatilho: “quando aparecer X, não raciocinar como Y”)</label><textarea name="gatilho">'+esc(e.gatilho)+'</textarea>'+
+  '<label class="check" style="font-size:13px;color:var(--text)"><input type="checkbox" name="done" '+(e.status==='concluido'?'checked':'')+'> Autópsia concluída</label>'+
+  '<div class="mfoot"><button type="button" class="btn" data-act="closeModal">Cancelar</button><button class="btn primary">Salvar</button></div></form>');
+}
+function saveErro(form){
+  const fd=new FormData(form);const id=fd.get('id');let e=id?S.erros.find(x=>x.id===id):{id:uid()};if(!id)S.erros.push(e);
+  ['qid','data','disc','assunto','marcada','certa','logica','premissa','regra','gatilho'].forEach(k=>e[k]=String(fd.get(k)||'').trim());
+  e.status=fd.get('done')?'concluido':'pendente';save();closeModal();render();toast('Erro salvo');
+}
+
+/* ---- simulado ---- */
+function simRow(){return'<div class="row simrow" style="margin-top:4px"><div><select class="sd">'+opts(discNames(),'')+'</select></div><div><input type="number" min="0" class="st" placeholder="Questões"></div><div><input type="number" min="0" class="sa" placeholder="Acertos"></div><div class="auto"><button type="button" class="btn sm danger" data-act="rmSim">×</button></div></div>'}
+function openSim(){
+  openModal('<h2>Registrar simulado</h2><form data-submit="saveSim"><div class="row"><div style="flex:2"><label>Nome / prova</label><input name="nome" required placeholder="Ex.: Simulado PGM — banca X"></div><div><label>Data</label><input type="date" name="data" value="'+today()+'"></div><div><label>Tempo gasto (min)</label><input type="number" min="0" name="min"></div></div>'+
+  '<label>Desempenho por disciplina</label><div id="simRows">'+simRow()+simRow()+'</div><button type="button" class="btn sm" data-act="addSimRow" style="margin-top:8px">+ disciplina</button>'+
+  '<label>Observações (onde perdi pontos, tempo, estratégia…)</label><textarea name="obs"></textarea><div class="mfoot"><button type="button" class="btn" data-act="closeModal">Cancelar</button><button class="btn primary">Salvar</button></div></form>',true);
+}
+function saveSim(form){
+  const fd=new FormData(form);const rows=[];form.querySelectorAll('.simrow').forEach(r=>{const t=Number(r.querySelector('.st').value),a=Number(r.querySelector('.sa').value);if(t>0&&a>=0&&a<=t)rows.push({disc:r.querySelector('.sd').value,total:t,acertos:a})});
+  if(!rows.length){toast('Informe ao menos uma disciplina com total e acertos válidos');return}
+  const sid=uid(),data=fd.get('data')||today(),min=Number(fd.get('min'))||0;
+  S.simulados.push({id:sid,nome:String(fd.get('nome')).trim(),data,min,obs:fd.get('obs'),rows});
+  rows.forEach(r=>S.logs.push({id:uid(),ts:Date.now(),data,disc:r.disc,assunto:'(simulado)',total:r.total,acertos:r.acertos,origem:'Simulado',simId:sid}));
+  if(min>0)S.sessoes.push({id:uid(),data,disc:'Misto',min,tipo:'Simulado',nota:String(fd.get('nome'))});
+  save();closeModal();render();toast('Simulado registrado');
+}
+
+/* ============ telas ============ */
+function vDashboard(){
+  const T0=today(),N=S.settings.amostra,meta=S.settings.meta;
+  const due=dueCards(),ss=stageStatus(),all=ss.all;
+  const hT=sumMin(T0,T0),hW=sumMin(addDays(T0,-6),T0),cards=allCards();
+  const empty=!S.topics.length&&!S.logs.length;
+  let h='';
+  if(empty)h+='<div class="hero"><h2>Bem-vindo ao seu painel de estudo ⚖️</h2><p style="margin:0 0 12px">Cadastre seu primeiro assunto (com as perguntas do AR) ou carregue um exemplo para ver o sistema funcionando. Seus dados ficam só neste navegador — use <b>Configurações → Exportar backup</b> com frequência.</p><button class="btn" data-act="newTopic">+ Cadastrar assunto</button> <button class="btn" data-act="loadDemo">Carregar exemplo</button></div>';
+  if(!empty&&FS.state==='unsupported'&&(!S.lastBackup||diffDays(T0,S.lastBackup)>7))h+='<div class="banner">💾 <span style="flex:1">Faz mais de 7 dias desde seu último backup. Seus dados ficam apenas neste navegador.</span><button class="btn sm" data-act="exportBackup">Exportar agora</button></div>';
+  h+='<div class="grid g4">'+
+   kpi('Revisões vencidas',due.length,'≈ '+due.length*3+' min · <a href="#" data-act="nav" data-v="hoje">ver fila do dia</a>',due.length?'bad':'good')+
+   kpi('Média atual ('+N+' últimas)',all.p==null?'—':all.p+'%',all.tot+' questões na amostra · meta '+meta+'%',cls(all.p))+
+   kpi('Horas hoje',fmtH(hT),'Semana: '+fmtH(hW)+' / '+S.settings.horasSemana+'h',hW/60>=S.settings.horasSemana?'good':'')+
+   kpi('Sequência',streak()+' dia'+(streak()===1?'':'s'),cards.length+' perguntas ativas · '+cards.filter(x=>consolidado(x.c)).length+' consolidadas')+'</div>';
+  const series=[{name:'Global',color:'#4338ca',pts:evolSeries({},N),dash:true},{name:'Núcleo duro',color:'#2563eb',pts:evolSeries({esc:1},N)},{name:'2º escalão',color:'#d97706',pts:evolSeries({esc:2},N)},{name:'3º escalão',color:'#16a34a',pts:evolSeries({esc:3},N)}];
+  h+='<div class="grid g21"><div class="card"><h3>Evolução rumo aos '+meta+'% <small>(média móvel das últimas '+N+' questões)</small></h3>'+lineChart(series,{meta})+'</div>';
+  const chip=(r,l)=>'<div class="brow" style="grid-template-columns:110px 1fr 54px"><span>'+l+'</span>'+progBar(r.p,meta)+'<b class="'+cls(r.p)+'">'+(r.p==null?'—':r.p+'%')+'</b></div>';
+  h+='<div class="card"><h3>Estágio '+ss.st+' <small>'+(ss.st===1?'Núcleo duro':ss.st===2?'Segundo escalão':'Edital')+'</small></h3>'+chip(ss.r1,'Núcleo')+chip(ss.r2,'2º escalão')+chip(ss.r3,'3º escalão')+'<p class="small muted" style="margin:10px 0 8px">'+esc(ss.txt)+'</p>'+(ss.ready?'<div class="badge g">✔ Critério atingido — considere avançar de estágio (Configurações)</div>':'<div class="badge m">Ainda não atingido / amostra insuficiente</div>')+'</div></div>';
+  const days=[];for(let i=13;i>=0;i--){const d=addDays(T0,-i);days.push({l:brShort(d),v:Math.round(sumMin(d,d)/6)/10,t:fmtH(sumMin(d,d))})}
+  const up=[];for(let i=0;i<14;i++){const d=addDays(T0,i);up.push({l:brShort(d),v:cards.filter(x=>i===0?x.c.prox<=d:x.c.prox===d).length,c:i===0?'var(--red)':'var(--primary)'})}
+  h+='<div class="grid g2"><div class="card"><h3>Horas por dia <small>(últimos 14 dias · meta diária ≈ '+Math.round(S.settings.horasSemana/7*10)/10+'h)</small></h3>'+barChart(days,{ref:S.settings.horasSemana/7,color:'#7c3aed'})+'</div><div class="card"><h3>Carga de revisões <small>(próximos 14 dias)</small></h3>'+barChart(up,{})+'</div></div>';
+  const lv=NIVEIS.map(n=>({l:'AR'+n,v:cards.filter(x=>x.c.nivel===n).length,c:n===15?'var(--red)':n===30?'var(--yellow)':n===60?'#ca8a04':n===90?'var(--green)':'var(--blue)'}));
+  const tab=UI.f.dbEsc||'0';
+  const dl=S.disciplinas.filter(d=>tab==='0'||String(d.e)===tab);
+  h+='<div class="grid g2"><div class="card"><h3>Desempenho por disciplina</h3><div class="tabs">'+[['0','Todas'],['1','Núcleo'],['2','2º'],['3','3º']].map(([v,l])=>'<a data-act="dbEsc" data-v="'+v+'" class="'+(tab===v?'on':'')+'">'+l+'</a>').join('')+'</div>'+
+   (dl.map(d=>{const r=rolling(logsFiltered({disc:d.n}),N);return'<div class="brow"><span>'+esc(d.n)+'</span>'+progBar(r.p,meta,r.p!=null&&r.p>=meta?'var(--green)':'var(--primary)')+'<b class="'+cls(r.p)+'">'+(r.p==null?'—':r.p+'%')+'</b></div>'}).join('')||emptyBox('Nenhuma disciplina'))+'<div class="small muted">Barra: média móvel · traço = meta</div></div>';
+  const agg={};S.logs.forEach(l=>{const k=l.disc+'|'+l.assunto;(agg[k]=agg[k]||{disc:l.disc,assunto:l.assunto,t:0,a:0});agg[k].t+=l.total;agg[k].a+=l.acertos});
+  const weak=Object.values(agg).filter(x=>x.t>=5&&x.assunto!=='(simulado)'&&pct(x.a,x.t)<meta).sort((a,b)=>pct(a.a,a.t)-pct(b.a,b.t)).slice(0,6);
+  h+='<div class="card"><h3>Distribuição das perguntas por nível</h3>'+barChart(lv,{h:150})+'<h3 style="margin-top:14px">Assuntos mais fracos <small>(abaixo da meta, ≥5 questões)</small></h3>'+(weak.length?weak.map(w=>'<div class="item"><div class="grow"><div class="t">'+esc(w.assunto)+'</div><div class="small muted">'+esc(w.disc)+' · '+w.a+'/'+w.t+'</div></div><b class="'+cls(pct(w.a,w.t))+'">'+pct(w.a,w.t)+'%</b></div>').join(''):'<div class="small muted">Nada abaixo da meta com amostra suficiente. 👏</div>')+'</div></div>';
+  return h;
+}
+
+const CHECK=[['rev','Revisões vencidas'],['novo','Conteúdo novo'],['leit','Leitura de legislação / informativos'],['expl','Explicar o conteúdo sem consulta'],['perg','Criar perguntas de examinador'],['ar','Criar AR correspondente'],['d2','Fazer questões que chegaram a D+2'],['err','Tratar erros com pelo menos 1 dia de distância'],['f2','Treinar segunda fase conforme estágio']];
+const TAREFA2={1:'Estágio 1 — Conhecer: leia 1 peça/espelho de prova anterior e identifique endereçamento, preliminares, fundamentos e pedidos.',2:'Estágio 2 — Treinar: resolva 1 questão/peça sem obrigação de acertar e anote onde travou, o que esqueceu e onde perdeu pontos.',3:'Estágio 3 — Performar: simulação cronometrada com critérios da banca; controle tempo, estrutura, pontuação por tópico e gramática.'};
+function vHoje(){
+  const T0=today(),due=dueCards();
+  const novos=S.topics.filter(t=>t.status==='planejado').sort((a,b)=>(a.previsto||'9').localeCompare(b.previsto||'9')).slice(0,4);
+  const d2=S.topics.filter(t=>t.status==='estudado'&&t.d2Date&&!t.d2Done&&t.d2Date<=T0);
+  const aut=S.erros.filter(e=>e.status!=='concluido'&&e.data<T0);
+  const byT={};due.forEach(x=>{(byT[x.t.id]=byT[x.t.id]||{t:x.t,list:[]}).list.push(x.c)});
+  const grupos=Object.values(byT);
+  let h='<div class="grid g21"><div>';
+  h+='<div class="card" style="margin-bottom:14px"><h3>1 · Revisões vencidas <small>'+due.length+' perguntas · ≈ '+due.length*3+' min</small></h3>'+(grupos.length?grupos.map(g=>{const od=Math.max(...g.list.map(c=>diffDays(T0,c.prox)));return'<div class="item"><div class="grow"><div class="t">'+esc(g.t.assunto)+'</div><div class="small muted">'+esc(g.t.disc)+' · '+g.list.length+' pergunta(s) · '+[...new Set(g.list.map(c=>'AR'+c.nivel))].join(', ')+(od>0?' · <span class="bad">'+od+'d de atraso</span>':'')+'</div></div><button class="btn sm primary" data-act="examTopic" data-id="'+g.t.id+'">Fazer prova</button></div>'}).join('')+'<div style="margin-top:10px"><button class="btn primary" data-act="examDue">▶ Iniciar todas as vencidas ('+Math.min(due.length,20)+')</button></div>':emptyBox('Nenhuma revisão vencida. ✅'))+'</div>';
+  h+='<div class="card" style="margin-bottom:14px"><h3>2 · Conteúdo novo</h3>'+(novos.length?novos.map(t=>'<div class="item"><div class="grow"><div class="t">'+esc(t.assunto)+'</div><div class="small muted">'+esc(t.disc)+' · '+nomeEsc[escOf(t.disc)]+(t.previsto?' · previsto '+br(t.previsto):'')+'</div></div><button class="btn sm" data-act="studied" data-id="'+t.id+'">Estudei hoje → criar perguntas</button></div>').join(''):emptyBox('Sem assuntos planejados. Cadastre os próximos em “+ Assunto”.'))+'</div>';
+  h+=agendaHojeHtml()+leituraHojeHtml();
+  h+='<div class="card" style="margin-bottom:14px"><h3>3 · Questões objetivas D+2</h3>'+(d2.length?d2.map(t=>'<div class="item"><div class="grow"><div class="t">'+esc(t.assunto)+'</div><div class="small muted">'+esc(t.disc)+' · estudado em '+br(t.estudo)+'</div></div><button class="btn sm primary" data-act="d2log" data-id="'+t.id+'">Registrar resultado</button><button class="btn sm ghost" data-act="d2skip" data-id="'+t.id+'">Dispensar</button></div>').join(''):emptyBox('Nada para D+2 hoje.'))+'</div>';
+  h+='<div class="card" style="margin-bottom:14px"><h3>4 · Autópsia dos erros <small>(liberados após 1 dia)</small></h3>'+(aut.length?aut.slice(0,8).map(e=>'<div class="item"><div class="grow"><div class="t">'+esc(e.qid)+'</div><div class="small muted">'+esc(e.disc)+' · '+esc(e.assunto)+' · '+br(e.data)+'</div></div><button class="btn sm" data-act="erro" data-id="'+e.id+'">Fazer autópsia</button></div>').join(''):emptyBox('Nenhum erro aguardando autópsia.'))+'</div>';
+  h+='<div class="card"><h3>5 · Segunda fase</h3><p style="margin:0 0 10px">'+esc(TAREFA2[S.settings.stage])+'</p><button class="btn" data-act="nav" data-v="fase2">Abrir treino de 2ª fase</button></div>';
+  h+='</div><div><div class="card" style="position:sticky;top:70px"><h3>Checklist de hoje <small>'+br(T0)+'</small></h3>';
+  const ck=S.checks[T0]||{};const n=CHECK.filter(([k])=>ck[k]).length;
+  h+=CHECK.map(([k,l])=>'<label class="check" style="font-size:13px;color:var(--text);margin:0"><input type="checkbox" data-act="check" data-k="'+k+'" '+(ck[k]?'checked':'')+'> '+l+'</label>').join('');
+  h+='<div class="bar" style="margin-top:12px"><i style="width:'+n/CHECK.length*100+'%"></i></div><div class="small muted" style="margin-top:6px">'+n+' de '+CHECK.length+' · Você não precisa fazer tudo na mesma sessão.</div>';
+  h+='<hr style="border:0;border-top:1px solid var(--border);margin:14px 0"><div class="small muted">Prioridade: vencidas → conteúdo novo → D+2 → autópsias → 2ª fase.</div></div></div></div>';
+  return h;
+}
+
+function vRevisao(){
+  const due=dueCards();const lim=Number(UI.f.lim)||20;
+  let h='';
+  if(S.exam)h+='<div class="banner">Há uma prova de revisão em andamento. <button class="btn sm primary" data-act="examResume">Retomar</button></div>';
+  h+='<div class="grid g3">'+kpi('Vencidas',due.length,'prontas para prova',due.length?'bad':'good')+kpi('Perguntas ativas',allCards().length,'em '+S.topics.filter(t=>t.status==='estudado').length+' assuntos')+kpi('Consolidadas (3 verdes)',allCards().filter(x=>consolidado(x.c)).length,'AR180')+'</div>';
+  h+='<div class="card" style="margin-bottom:14px"><h3>Montar prova</h3><div class="row"><div><label>Disciplina</label><select data-filter="rd">'+opts(discNames(),F('rd'),'Todas')+'</select></div><div><label>Escalão</label><select data-filter="re">'+opts(escOpts,F('re'),'Todos')+'</select></div><div><label>Máx. de perguntas</label><input type="number" min="1" data-filter="lim" id="limIn" value="'+lim+'"></div><div class="auto"><button class="btn primary" data-act="examBuild">▶ Prova com vencidas</button></div></div>'+
+   '<div class="row" style="margin-top:6px"><div class="auto"><button class="btn" data-act="examFree">Treino livre (sorteio, mesmo sem vencer)</button></div><div class="small muted" style="align-self:center">No treino livre o resultado <b>não</b> altera o agendamento.</div></div></div>';
+  const g={};due.forEach(x=>{(g[x.t.id]=g[x.t.id]||{t:x.t,n:0}).n++});
+  h+='<div class="card"><h3>Vencidas por assunto</h3>'+(Object.values(g).length?'<div class="tw"><table><tr><th>Disciplina</th><th>Assunto</th><th>Perguntas</th><th></th></tr>'+Object.values(g).map(x=>'<tr><td>'+esc(x.t.disc)+'</td><td>'+esc(x.t.assunto)+'</td><td>'+x.n+'</td><td style="text-align:right"><button class="btn sm primary" data-act="examTopic" data-id="'+x.t.id+'">Fazer prova</button></td></tr>').join('')+'</table></div>':emptyBox('Nada vencido.'))+'</div>';
+  return h;
+}
+
+function vConteudos(){
+  let list=S.topics.slice();
+  if(F('cd'))list=list.filter(t=>t.disc===F('cd'));
+  if(F('ce'))list=list.filter(t=>String(escOf(t.disc))===F('ce'));
+  if(F('cs'))list=list.filter(t=>t.status===F('cs'));
+  if(F('cq'))list=list.filter(t=>(t.assunto+' '+t.disc).toLowerCase().includes(F('cq').toLowerCase()));
+  list.sort((a,b)=>(a.disc+a.assunto).localeCompare(b.disc+b.assunto));
+  let h='<div class="filters">'+fsel('cd',discNames(),'Todas as disciplinas')+fsel('ce',escOpts,'Todos os escalões')+fsel('cs',[['planejado','Planejados'],['estudado','Estudados']],'Qualquer situação')+'<input id="cqIn" data-filter="cq" placeholder="Buscar assunto…" value="'+esc(F('cq'))+'"><span style="flex:1"></span><button class="btn primary" data-act="newTopic">+ Novo assunto</button></div>';
+  h+='<div class="card">'+(list.length?'<div class="tw"><table><tr><th>Disciplina</th><th>Assunto</th><th>Escalão</th><th>Situação</th><th>Estudo</th><th>Perg.</th><th>Próx. revisão</th><th>Níveis</th><th></th></tr>'+list.map(t=>{const nx=topicNext(t);const od=nx&&nx<=today();const nv=[...new Set(t.cards.map(c=>c.nivel))].sort((a,b)=>a-b);return'<tr><td>'+esc(t.disc)+'</td><td><b>'+esc(t.assunto)+'</b></td><td><span class="badge b">'+(nomeEsc[escOf(t.disc)]||'—')+'</span></td><td>'+(t.status==='estudado'?'<span class="badge g">estudado</span>':'<span class="badge m">planejado</span>')+'</td><td>'+br(t.estudo)+'</td><td>'+t.cards.length+'</td><td class="'+(od?'bad':'')+'">'+(nx?br(nx):'—')+'</td><td>'+(t.status==='estudado'?nv.map(n=>'AR'+n).join(' '):'—')+'</td><td style="white-space:nowrap;text-align:right"><button class="btn sm" data-act="editTopic" data-id="'+t.id+'">Editar</button> <button class="btn sm danger" data-act="delTopic" data-id="'+t.id+'">Excluir</button></td></tr>'}).join('')+'</table></div>':emptyBox(S.topics.length?'Nenhum assunto com esses filtros.':'Nenhum assunto ainda. Clique em “+ Novo assunto”.'))+'</div>';
+  return h;
+}
+
+function vDesempenho(){
+  const N=S.settings.amostra,meta=S.settings.meta;
+  const f={};if(F('pe'))f.esc=Number(F('pe'));if(F('pd'))f.disc=F('pd');
+  const list=logsFiltered(f);const r=rolling(list,N);const tot=list.reduce((a,l)=>a+l.total,0),ac=list.reduce((a,l)=>a+l.acertos,0);
+  let h='<div class="filters">'+fsel('pe',escOpts,'Todos os escalões')+fsel('pd',discNames(),'Todas as disciplinas')+'<span style="flex:1"></span><button class="btn primary" data-act="quickLog">+ Registrar questões</button></div>';
+  h+='<div class="grid g3">'+kpi('Média móvel ('+N+')',r.p==null?'—':r.p+'%',r.tot+' questões na amostra',cls(r.p))+kpi('Média geral',tot?pct(ac,tot)+'%':'—',ac+'/'+tot+' questões',cls(pct(ac,tot)))+kpi('Meta',meta+'%',r.p==null?'':(r.p>=meta?'Acima da meta':'Faltam '+Math.round((meta-r.p)*10)/10+' p.p.'),r.p>=meta?'good':'warn')+'</div>';
+  h+='<div class="card" style="margin-bottom:14px"><h3>Evolução</h3>'+lineChart([{name:'Média móvel',color:'#4338ca',pts:evolSeries(f,N)}],{meta})+'</div>';
+  const rows=S.disciplinas.filter(d=>(!f.esc||d.e===f.esc)&&(!f.disc||d.n===f.disc)).map(d=>{const l=logsFiltered({disc:d.n});const rr=rolling(l,N);return{d,t:l.reduce((a,x)=>a+x.total,0),a:l.reduce((a,x)=>a+x.acertos,0),r:rr}});
+  h+='<div class="grid g2"><div class="card"><h3>Por disciplina</h3><div class="tw"><table><tr><th>Disciplina</th><th>Escalão</th><th>Questões</th><th>Geral</th><th>Média móvel</th></tr>'+rows.map(x=>'<tr><td>'+esc(x.d.n)+'</td><td>'+x.d.e+'º</td><td>'+x.t+'</td><td>'+(x.t?pct(x.a,x.t)+'%':'—')+'</td><td class="'+cls(x.r.p)+'"><b>'+(x.r.p==null?'—':x.r.p+'%')+'</b></td></tr>').join('')+'</table></div></div>';
+  const agg={};list.forEach(l=>{const k=l.disc+'|'+l.assunto;(agg[k]=agg[k]||{disc:l.disc,assunto:l.assunto,t:0,a:0});agg[k].t+=l.total;agg[k].a+=l.acertos});
+  const as=Object.values(agg).sort((a,b)=>pct(a.a,a.t)-pct(b.a,b.t));
+  h+='<div class="card"><h3>Por assunto <small>(pior → melhor)</small></h3><div class="tw" style="max-height:340px"><table><tr><th>Assunto</th><th>Disc.</th><th>Q.</th><th>%</th></tr>'+(as.map(x=>'<tr><td>'+esc(x.assunto)+'</td><td class="muted">'+esc(x.disc)+'</td><td>'+x.t+'</td><td class="'+cls(pct(x.a,x.t))+'"><b>'+pct(x.a,x.t)+'%</b></td></tr>').join('')||'<tr><td colspan="4" class="muted">Sem registros.</td></tr>')+'</table></div></div></div>';
+  h+='<div class="card"><h3>Últimos registros</h3>'+(list.length?'<div class="tw"><table><tr><th>Data</th><th>Disciplina</th><th>Assunto</th><th>Origem</th><th>Resultado</th><th></th></tr>'+list.slice().reverse().slice(0,30).map(l=>'<tr><td>'+br(l.data)+'</td><td>'+esc(l.disc)+'</td><td>'+esc(l.assunto)+'</td><td class="muted">'+esc(l.origem||'')+'</td><td>'+l.acertos+'/'+l.total+' <b class="'+cls(pct(l.acertos,l.total))+'">('+pct(l.acertos,l.total)+'%)</b></td><td style="text-align:right"><button class="btn sm danger" data-act="delLog" data-id="'+l.id+'">×</button></td></tr>').join('')+'</table></div>':emptyBox('Sem registros ainda.'))+'</div>';
+  return h;
+}
+
+function vSimulados(){
+  const meta=S.settings.meta;const list=S.simulados.slice().sort((a,b)=>a.data.localeCompare(b.data));
+  const sc=s=>{const t=s.rows.reduce((a,r)=>a+r.total,0),a=s.rows.reduce((x,r)=>x+r.acertos,0);return{t,a,p:pct(a,t)}};
+  let h='<div class="filters"><span style="flex:1"></span><button class="btn primary" data-act="newSim">+ Registrar simulado</button></div>';
+  h+='<div class="card" style="margin-bottom:14px"><h3>Evolução dos simulados</h3>'+lineChart([{name:'Nota (%)',color:'#7c3aed',pts:list.map(s=>({x:s.data,y:sc(s).p}))}],{meta})+'</div>';
+  h+='<div class="card"><h3>Histórico</h3>'+(list.length?list.slice().reverse().map(s=>{const r=sc(s);return'<div class="item" style="align-items:flex-start"><div class="grow"><div class="t">'+esc(s.nome)+'</div><div class="small muted">'+br(s.data)+(s.min?' · '+fmtH(s.min):'')+' · '+r.a+'/'+r.t+'</div><div class="small" style="margin-top:4px">'+s.rows.map(x=>esc(x.disc)+': <b class="'+cls(pct(x.acertos,x.total))+'">'+pct(x.acertos,x.total)+'%</b>').join(' · ')+'</div>'+(s.obs?'<div class="small muted" style="margin-top:4px">'+esc(s.obs)+'</div>':'')+'</div><b class="'+cls(r.p)+'" style="font-size:20px">'+r.p+'%</b><button class="btn sm danger" data-act="delSim" data-id="'+s.id+'">Excluir</button></div>'}).join(''):emptyBox('Nenhum simulado registrado. Os resultados alimentam o gráfico dos '+meta+'%.'))+'</div>';
+  return h;
+}
+
+function vErros(){
+  let list=S.erros.slice().sort((a,b)=>b.data.localeCompare(a.data));
+  if(F('ed'))list=list.filter(e=>e.disc===F('ed'));
+  if(F('es'))list=list.filter(e=>(F('es')==='pendente')===(e.status!=='concluido'));
+  let h='<div class="filters">'+fsel('ed',discNames(),'Todas as disciplinas')+fsel('es',[['pendente','Pendentes'],['concluido','Concluídos']],'Todos')+'<span style="flex:1"></span><button class="btn primary" data-act="newErro">+ Registrar erro</button></div>';
+  h+='<div class="card" style="margin-bottom:14px"><h3>Protocolo</h3><div class="small">Errou? Só registre o ID (sem investigar agora). <b>No dia seguinte</b> ou depois: recupere a questão sem olhar a explicação → reconstrua a lógica → identifique a premissa equivocada → formule a regra → escreva o gatilho. O AR pergunta “consigo recuperar?”; o caderno de erros pergunta “por que pensei errado?”.</div></div>';
+  h+='<div class="card">'+(list.length?list.map(e=>{const lib=e.data<today();return'<div class="item" style="align-items:flex-start"><div class="grow"><div class="t">'+esc(e.qid)+' <span class="badge '+(e.status==='concluido'?'g':lib?'y':'m')+'">'+(e.status==='concluido'?'concluído':lib?'autópsia liberada':'aguardar D+1')+'</span></div><div class="small muted">'+esc(e.disc)+' · '+esc(e.assunto)+' · '+br(e.data)+(e.marcada?' · marquei '+esc(e.marcada)+(e.certa?' / era '+esc(e.certa):''):'')+'</div>'+(e.gatilho?'<div class="small" style="margin-top:4px">🔔 '+esc(e.gatilho)+'</div>':'')+(e.premissa?'<div class="small muted" style="margin-top:2px">Premissa equivocada: '+esc(e.premissa)+'</div>':'')+'</div><button class="btn sm" data-act="erro" data-id="'+e.id+'">'+(e.status==='concluido'?'Ver / editar':'Autópsia')+'</button><button class="btn sm danger" data-act="delErro" data-id="'+e.id+'">×</button></div>'}).join(''):emptyBox('Nenhum erro registrado.'))+'</div>';
+  return h;
+}
+
+const TIPOS_H=['Teoria','Leitura','Explicação / perguntas','AR (revisão)','Questões','Autópsia de erros','Segunda fase','Simulado','Outro'];
+function vHoras(){
+  const T0=today(),run=S.timer;
+  let h='<div class="grid g3">'+kpi('Hoje',fmtH(sumMin(T0,T0)),'')+kpi('Últimos 7 dias',fmtH(sumMin(addDays(T0,-6),T0)),'Meta '+S.settings.horasSemana+'h',sumMin(addDays(T0,-6),T0)/60>=S.settings.horasSemana?'good':'')+kpi('Mês corrente',fmtH(sumMin(T0.slice(0,8)+'01',T0)),'')+'</div>';
+  h+='<div class="grid g2"><div class="card"><h3>Cronômetro</h3>'+(run?'<div style="font-size:34px;font-weight:700" id="bigTimer">00:00:00</div><div class="small muted" style="margin-bottom:10px">'+esc(run.disc)+' · '+esc(run.tipo)+'</div><button class="btn r" data-act="timerStop">■ Parar e salvar</button> <button class="btn ghost" data-act="timerCancel">Descartar</button>':'<div class="row"><div><label>Disciplina</label><select id="tdisc">'+opts(discNames().concat(['Misto']),'')+'</select></div><div><label>Atividade</label><select id="ttipo">'+opts(TIPOS_H,'')+'</select></div></div><div style="margin-top:12px"><button class="btn g" data-act="timerStart">▶ Iniciar</button></div>')+'</div>';
+  h+='<div class="card"><h3>Lançamento manual</h3><form data-submit="addSessao"><div class="row"><div><label>Data</label><input type="date" name="data" value="'+T0+'"></div><div><label>Minutos</label><input type="number" min="1" name="min" required></div></div><div class="row"><div><label>Disciplina</label><select name="disc">'+opts(discNames().concat(['Misto']),'')+'</select></div><div><label>Atividade</label><select name="tipo">'+opts(TIPOS_H,'')+'</select></div></div><div style="margin-top:12px"><button class="btn primary">Adicionar</button></div></form></div></div>';
+  const days=[];for(let i=13;i>=0;i--){const d=addDays(T0,-i);days.push({l:brShort(d),v:Math.round(sumMin(d,d)/6)/10,t:fmtH(sumMin(d,d))})}
+  const w=S.sessoes.filter(s=>s.data>=addDays(T0,-6));const byD={},byT={};w.forEach(s=>{byD[s.disc]=(byD[s.disc]||0)+s.min;byT[s.tipo]=(byT[s.tipo]||0)+s.min});
+  const bl=o=>{const mx=Math.max(1,...Object.values(o));return Object.entries(o).sort((a,b)=>b[1]-a[1]).map(([k,v])=>'<div class="brow" style="grid-template-columns:150px 1fr 60px"><span>'+esc(k)+'</span><div class="bar"><i style="width:'+v/mx*100+'%"></i></div><b>'+fmtH(v)+'</b></div>').join('')||'<div class="small muted">Sem dados.</div>'};
+  h+='<div class="card" style="margin-bottom:14px"><h3>Horas por dia <small>(últimos 14 dias)</small></h3>'+barChart(days,{ref:S.settings.horasSemana/7,color:'#7c3aed'})+'</div><div class="grid g2"><div class="card"><h3>Por disciplina <small>(7 dias)</small></h3>'+bl(byD)+'</div><div class="card"><h3>Por atividade <small>(7 dias)</small></h3>'+bl(byT)+'</div></div>';
+  h+='<div class="card"><h3>Últimos lançamentos</h3>'+(S.sessoes.length?'<div class="tw"><table><tr><th>Data</th><th>Disciplina</th><th>Atividade</th><th>Tempo</th><th></th></tr>'+S.sessoes.slice().sort((a,b)=>b.data.localeCompare(a.data)).slice(0,25).map(s=>'<tr><td>'+br(s.data)+'</td><td>'+esc(s.disc)+'</td><td>'+esc(s.tipo)+'</td><td>'+fmtH(s.min)+'</td><td style="text-align:right"><button class="btn sm danger" data-act="delSessao" data-id="'+s.id+'">×</button></td></tr>').join('')+'</table></div>':emptyBox('Nenhum lançamento.'))+'</div>';
+  return h;
+}
+
+function vFase2(){
+  const st=S.settings.stage;
+  const E=[['1','Conhecer','Entender a estrutura: peças, endereçamento, pedidos, preliminares, fundamentos, critérios de correção. Ler peças de concursos anteriores. Sem obrigação de “tirar 10”.'],['2','Treinar','Resolver sem obrigação de acertar. Descobrir onde trava, quais peças confunde, quais fundamentos esquece, onde perde pontos e quais erros gramaticais comete.'],['3','Performar','Ganhar pontos: controlar tempo, estrutura, fundamentação, jurisprudência, gramática, objetividade e pontuação por tópico. Provas direcionadas à banca.']];
+  let h='<div class="grid g3">'+E.map(e=>'<div class="card" style="'+(Number(e[0])===st?'border-color:var(--primary);box-shadow:0 0 0 2px var(--primary-soft)':'')+'"><h3>Estágio '+e[0]+' — '+e[1]+(Number(e[0])===st?' <span class="badge">atual</span>':'')+'</h3><div class="small">'+e[2]+'</div></div>').join('')+'</div>';
+  h+='<div class="grid g2"><div class="card"><h3>Registrar treino</h3><form data-submit="addTreino"><div class="row"><div><label>Data</label><input type="date" name="data" value="'+today()+'"></div><div><label>Disciplina</label><select name="disc">'+opts(discNames(),'')+'</select></div></div><div class="row"><div style="flex:2"><label>Peça / questão</label><input name="tema" required placeholder="Ex.: Contestação — responsabilidade civil"></div><div><label>Tipo</label><select name="tipo">'+opts(['Peça','Discursiva','Parecer','Leitura de espelho'],'')+'</select></div></div><div class="row"><div><label>Minutos</label><input type="number" min="0" name="min"></div><div><label>Nota (0–10, opcional)</label><input type="number" step="0.1" min="0" max="10" name="nota"></div></div><label>Onde travei / o que perdi / o que ajustar</label><textarea name="obs"></textarea><div style="margin-top:12px"><button class="btn primary">Salvar treino</button></div></form></div>';
+  h+='<div class="card"><h3>Roteiro mental do Procurador</h3><ol style="margin:0;padding-left:20px" class="small">'+['Qual é o fato?','Qual é o problema jurídico?','Quem tem competência?','Qual norma rege o caso?','Há jurisprudência relevante?','Qual é a tese favorável à Fazenda?','Qual é a tese contrária?','Existe risco jurídico?','Qual providência processual/administrativa deve ser tomada?','Qual seria a resposta de uma Procuradoria?'].map(x=>'<li>'+x+'</li>').join('')+'</ol></div></div>';
+  const tr=S.treinos.slice().sort((a,b)=>b.data.localeCompare(a.data));const notas=tr.filter(t=>t.nota!=='');
+  h+='<div class="card"><h3>Treinos <small>'+tr.length+' registrados'+(notas.length?' · nota média '+(Math.round(notas.reduce((a,t)=>a+Number(t.nota),0)/notas.length*10)/10):'')+'</small></h3>'+(tr.length?tr.map(t=>'<div class="item" style="align-items:flex-start"><div class="grow"><div class="t">'+esc(t.tema)+'</div><div class="small muted">'+br(t.data)+' · '+esc(t.disc)+' · '+esc(t.tipo)+(t.min?' · '+t.min+' min':'')+' · estágio '+t.stage+'</div>'+(t.obs?'<div class="small" style="margin-top:3px">'+esc(t.obs)+'</div>':'')+'</div>'+(t.nota!==''?'<b style="font-size:18px">'+t.nota+'</b>':'')+'<button class="btn sm danger" data-act="delTreino" data-id="'+t.id+'">×</button></div>').join(''):emptyBox('Nenhum treino registrado.'))+'</div>';
+  return h;
+}
+
+function vMetodo(){return`<div class="card method"><h3>Método Procuradoria — resumo de uma página</h3><pre>CONSTRUÇÃO (D0)
+Estudar → fechar material → explicar → perguntar como examinador → responder → conferir/corrigir → criar AR30
+
+D+2   Questões objetivas do assunto
+D+3   Autópsia dos erros (nunca no mesmo momento do erro)
+
+REVISÃO (a data conta a partir da revisão feita)
+AR30:   🟢 → AR90   🟡 → AR60   🔴 → AR30
+Falha total de recuperação (“não faço ideia”) → AR15
+AR15:   🟢 → AR60   🟡 → AR45   🔴 → AR15
+3 verdes consecutivos → AR180 (conhecimento consolidado, mantido no sistema)
+
+SEMPRE
+Questões + caderno de erros. Respostas com regra + fundamento legal + jurisprudência + exceção + aplicação.
+
+PROGRESSÃO (média móvel das últimas 100–150 questões)
+85% núcleo duro → estágio 2
+85% 2º escalão + manutenção do núcleo → estágio 3
+85% nos três escalões → manutenção + concursos
+
+TRÊS REGRAS
+1. Nunca criar revisão nova sem registrar a próxima data.
+2. Nunca fazer revisão sem classificar o resultado.
+3. Nunca deixar um erro sem descobrir a premissa que o produziu.</pre></div>`}
+
+function vConfig(){
+  const s=S.settings;
+  let h=driveCard()+fsCard()+'<div class="grid g2"><div class="card"><h3>Preferências</h3><form data-submit="saveCfg"><div class="row"><div><label>Estágio atual</label><select name="stage">'+opts([[1,'1 — Núcleo duro'],[2,'2 — Segundo escalão'],[3,'3 — Edital']],s.stage)+'</select></div><div><label>Meta de acertos (%)</label><input type="number" min="1" max="100" name="meta" value="'+s.meta+'"></div></div><div class="row"><div><label>Amostra da média móvel (questões)</label><input type="number" min="20" name="amostra" value="'+s.amostra+'"></div><div><label>Meta de horas por semana</label><input type="number" min="1" name="horasSemana" value="'+s.horasSemana+'"></div></div><div style="margin-top:12px"><button class="btn primary">Salvar</button></div></form></div>';
+  h+='<div class="card"><h3>Backup e dados</h3><p class="small muted" style="margin-top:0">Cópia extra de segurança: exporte um backup (JSON) de vez em quando e guarde em outra pasta.'+(S.lastBackup?' Último: '+br(S.lastBackup)+'.':'')+'</p><div class="row"><button class="btn primary auto" data-act="exportBackup">⬇ Exportar backup</button><label class="btn auto" style="margin:0;color:var(--text);font-size:13px">⬆ Importar backup<input type="file" accept=".json" id="impFile" style="display:none"></label></div><hr style="border:0;border-top:1px solid var(--border);margin:14px 0"><div class="row"><button class="btn auto" data-act="loadDemo">Carregar exemplo</button><button class="btn auto" data-act="rmDemo">Remover exemplos</button><button class="btn auto danger" data-act="resetAll">Apagar tudo</button></div></div></div>';
+  h+='<div class="card"><h3>Disciplinas e escalões</h3><div class="tw"><table><tr><th>Disciplina</th><th>Escalão</th><th></th></tr>'+S.disciplinas.map((d,i)=>'<tr><td>'+esc(d.n)+'</td><td><select data-act="discEsc" data-i="'+i+'" style="width:auto">'+opts(escOpts,d.e)+'</select></td><td style="text-align:right"><button class="btn sm danger" data-act="delDisc" data-i="'+i+'">remover</button></td></tr>').join('')+'</table></div><form data-submit="addDisc" class="row" style="margin-top:10px"><div style="flex:2"><input name="n" placeholder="Nova disciplina" required></div><div><select name="e">'+opts(escOpts,3)+'</select></div><div class="auto"><button class="btn">Adicionar</button></div></form></div>';
+  return h;
+}
+
+const VIEWS={dashboard:{t:'Dashboard',i:'📊',r:vDashboard},hoje:{t:'Fila do dia',i:'🎯',r:vHoje},calendario:{t:'Calendário',i:'🗓️',r:vCalendario},revisao:{t:'Revisão (prova)',i:'📝',r:vRevisao},conteudos:{t:'Conteúdos',i:'📚',r:vConteudos},leituras:{t:'Leituras',i:'📜',r:vLeituras},desempenho:{t:'Desempenho',i:'📈',r:vDesempenho},simulados:{t:'Simulados',i:'🏁',r:vSimulados},erros:{t:'Caderno de erros',i:'🧠',r:vErros},horas:{t:'Horas',i:'⏱️',r:vHoras},fase2:{t:'Segunda fase',i:'✍️',r:vFase2},metodo:{t:'Guia do método',i:'📖',r:vMetodo},config:{t:'Configurações',i:'⚙️',r:vConfig}};
+
+/* ============ prova de revisão ============ */
+function startExam(ids,aplicar){
+  if(!ids.length){toast('Nenhuma pergunta disponível');return}
+  if(S.exam&&!confirm('Há uma prova em andamento. Descartá-la e iniciar outra?'))return;
+  S.exam={ids,idx:0,resp:{},flag:{},marks:{},fase:'prova',inicio:Date.now(),aplicar:aplicar!==false};save();render();
+}
+function examIds(filter,lim){let d=dueCards();if(F('rd'))d=d.filter(x=>x.t.disc===F('rd'));if(F('re'))d=d.filter(x=>String(escOf(x.t.disc))===F('re'));if(filter)d=d.filter(filter);return d.slice(0,lim||20).map(x=>x.c.id)}
+const fmtT=ms=>{const s=Math.floor(ms/1000);return pad(Math.floor(s/60))+':'+pad(s%60)};
+function renderExam(){
+  const el=$('#exam'),E=S.exam;
+  if(!E){el.classList.remove('on');el.innerHTML='';return}
+  E.ids=E.ids.filter(id=>findCard(id));if(!E.ids.length){S.exam=null;save();return renderExam()}
+  E.idx=Math.min(E.idx,E.ids.length-1);el.classList.add('on');
+  const n=E.ids.length,cur=findCard(E.ids[E.idx]);const prova=E.fase==='prova';
+  const nav=E.ids.map((id,i)=>{let c='qn';if(prova){if((E.resp[id]||'').trim())c+=' done';if(E.flag[id])c+=' flag'}else c+=' m'+(E.marks[id]==='x'?'r':E.marks[id]||'');if(i===E.idx)c+=' cur';return'<div class="'+c+'" data-act="exGo" data-i="'+i+'">'+(i+1)+'</div>'}).join('');
+  let main='<div class="small muted">Questão '+(E.idx+1)+' de '+n+' · '+esc(cur.t.disc)+' — '+esc(cur.t.assunto)+' · '+nivBadge(cur.c)+' · '+(cur.c.tipo==='procurador'?'Advogado público':'Conhecimento')+'</div><div class="ex-q">'+esc(cur.c.q)+'</div>';
+  if(prova){
+    main+='<textarea id="exAns" placeholder="Responda de memória, como na prova: regra → fundamento legal → jurisprudência → exceção → aplicação.">'+esc(E.resp[cur.c.id]||'')+'</textarea><div class="row" style="margin-top:12px"><label class="check auto" style="margin:0;color:var(--text);font-size:13px"><input type="checkbox" data-act="exFlag" '+(E.flag[cur.c.id]?'checked':'')+'> Marcar para revisar</label><span style="flex:1"></span><button class="btn auto" data-act="exPrev" '+(E.idx===0?'disabled':'')+'>← Anterior</button><button class="btn primary auto" data-act="exNext" '+(E.idx===n-1?'disabled':'')+'>Próxima →</button></div>';
+  }else{
+    const m=E.marks[cur.c.id];const pv=k=>{const x=nextState(cur.c,k);return'AR'+x.nv+' em '+br(x.prox)};
+    main+='<div class="grid g2" style="margin-top:6px"><div><label>Sua resposta</label><div class="pre">'+(esc(E.resp[cur.c.id]||'')||'<span class="muted">(em branco)</span>')+'</div></div><div><label>Gabarito</label><div class="pre" style="border-color:var(--primary)">'+(esc(cur.c.a)||'<span class="muted">(sem resposta-modelo cadastrada)</span>')+'</div></div></div>'+
+    '<label>Como foi? (a próxima data conta a partir de hoje)</label><div class="row"><button class="btn g auto '+(m==='g'?'sel':'')+'" data-act="exMark" data-m="g">🟢 Acertei → '+pv('g')+'</button><button class="btn y auto '+(m==='y'?'sel':'')+'" data-act="exMark" data-m="y">🟡 Parcial → '+pv('y')+'</button><button class="btn r auto '+(m==='r'?'sel':'')+'" data-act="exMark" data-m="r">🔴 Errei → '+pv('r')+'</button><button class="btn auto '+(m==='x'?'sel':'')+'" style="border-color:var(--red);color:var(--red)" data-act="exMark" data-m="x" title="Falha grave de recuperação: não fazia ideia de como responder">⚠ Não fazia ideia → AR15</button></div>'+
+    '<div class="row" style="margin-top:14px"><button class="btn auto" data-act="exPrev" '+(E.idx===0?'disabled':'')+'>← Anterior</button><button class="btn auto" data-act="exNext" '+(E.idx===n-1?'disabled':'')+'>Próxima →</button></div>';
+  }
+  const done=E.ids.filter(id=>E.marks[id]).length;
+  el.innerHTML='<div class="ex-top"><b>'+(prova?'📝 PROVA DE REVISÃO':'✅ CORREÇÃO')+' · '+n+' pergunta(s)'+(E.aplicar?'':' · treino livre (não altera datas)')+'</b><span class="small" style="opacity:.7">sugerido: '+n*3+' min</span><span id="exTimer">'+fmtT(Date.now()-E.inicio)+'</span>'+(prova?'<button class="btn primary" data-act="exFinish">Entregar prova</button>':'<button class="btn primary" data-act="exDone" '+(done<n?'disabled':'')+'>Concluir ('+done+'/'+n+')</button>')+'<button class="btn ghost" style="color:#fff" data-act="exCancel">Sair</button></div><div class="ex-body"><div class="ex-nav"><div class="small muted" style="margin-bottom:8px">Navegação</div><div class="grid2">'+nav+'</div>'+(prova?'<div class="small muted" style="margin-top:12px">Respondidas: '+E.ids.filter(id=>(E.resp[id]||'').trim()).length+'/'+n+'</div>':'')+'</div><div class="ex-main">'+main+'</div></div>';
+  const ta=$('#exAns');if(ta&&!ta.dataset.f){ta.dataset.f=1}
+}
+setInterval(()=>{const E=S.exam,t=$('#exTimer');if(E&&t)t.textContent=fmtT(Date.now()-E.inicio);const r=S.timer,b=$('#bigTimer');if(r&&b)b.textContent=fmtHMS(Date.now()-r.start);const c=$('#timerChip .tc');if(r&&c)c.textContent=fmtHMS(Date.now()-r.start)},1000);
+const fmtHMS=ms=>{const s=Math.floor(ms/1000);return pad(Math.floor(s/3600))+':'+pad(Math.floor(s/60)%60)+':'+pad(s%60)};
+document.addEventListener('input',e=>{if(e.target.id==='exAns'&&S.exam){const E=S.exam,id=E.ids[E.idx];E.resp[id]=e.target.value;clearTimeout(window._sv);window._sv=setTimeout(save,400);const q=document.querySelectorAll('.qn')[E.idx];if(q)q.classList.toggle('done',!!e.target.value.trim())}});
+
+/* ============ ações ============ */
+const ACT={
+  nav(el,e){e&&e.preventDefault();UI.view=el.dataset.v;window.scrollTo(0,0);render()},
+  theme(){const cur=document.documentElement.dataset.theme==='dark'?'light':'dark';S.settings.tema=cur;save();applyTheme()},
+  closeModal(){closeModal()},
+  newTopic(){openTopic()},editTopic(el){openTopic(el.dataset.id)},
+  delTopic(el){if(confirm('Excluir este assunto e todas as suas perguntas?')){S.topics=S.topics.filter(t=>t.id!==el.dataset.id);save();render()}},
+  addCardEdit(){$('#cardsBox').insertAdjacentHTML('beforeend',cardEditHtml(newCard()))},
+  rmCard(el){el.closest('.cedit').remove()},
+  gab(el,e){e.preventDefault();const ta=el.closest('.cedit').querySelector('.ca');if(!ta.value.trim())ta.value=GAB;ta.focus()},
+  toggleBulk(){const b=$('#bulk');b.style.display=b.style.display==='none'?'block':'none'},
+  bulkAdd(){const items=parseBulk($('#bulkTxt').value);if(!items.length){toast('Nenhuma pergunta (P:) encontrada');return}$('#cardsBox').insertAdjacentHTML('beforeend',items.map(o=>cardEditHtml(newCard({q:o.q,a:o.a}))).join(''));$('#bulkTxt').value='';toast(items.length+' pergunta(s) adicionada(s) — clique em Salvar')},
+  studied(el){openTopic(el.dataset.id,{status:'estudado',estudo:today()})},
+  quickLog(){openLog()},
+  d2log(el){const t=S.topics.find(x=>x.id===el.dataset.id);openLog({topicId:t.id,disc:t.disc,assunto:t.assunto,origem:'Questões D+2'})},
+  d2skip(el){const t=S.topics.find(x=>x.id===el.dataset.id);t.d2Done=true;save();render()},
+  delLog(el){if(confirm('Excluir este registro?')){S.logs=S.logs.filter(l=>l.id!==el.dataset.id);save();render()}},
+  newSim(){openSim()},addSimRow(){$('#simRows').insertAdjacentHTML('beforeend',simRow())},rmSim(el){el.closest('.simrow').remove()},
+  delSim(el){if(confirm('Excluir este simulado?')){S.simulados=S.simulados.filter(s=>s.id!==el.dataset.id);S.logs=S.logs.filter(l=>l.simId!==el.dataset.id);save();render()}},
+  newErro(){openErro()},erro(el){openErro(el.dataset.id)},
+  delErro(el){if(confirm('Excluir este erro?')){S.erros=S.erros.filter(x=>x.id!==el.dataset.id);save();render()}},
+  check(el){const T0=today();(S.checks[T0]=S.checks[T0]||{})[el.dataset.k]=el.checked;save();render()},
+  dbEsc(el){UI.f.dbEsc=el.dataset.v;render()},
+  timerStart(){S.timer={start:Date.now(),disc:$('#tdisc').value,tipo:$('#ttipo').value};save();render()},
+  timerStop(){const r=S.timer;if(!r)return;const min=Math.max(1,Math.round((Date.now()-r.start)/60000));S.sessoes.push({id:uid(),data:today(),disc:r.disc,min,tipo:r.tipo,nota:''});S.timer=null;save();render();toast('Sessão salva: '+min+' min')},
+  timerCancel(){S.timer=null;save();render()},
+  delSessao(el){S.sessoes=S.sessoes.filter(s=>s.id!==el.dataset.id);save();render()},
+  delTreino(el){S.treinos=S.treinos.filter(s=>s.id!==el.dataset.id);save();render()},
+  discEsc(el){S.disciplinas[el.dataset.i].e=Number(el.value);save();render()},
+  delDisc(el){const d=S.disciplinas[el.dataset.i];if(confirm('Remover "'+d.n+'" da lista? (assuntos e registros existentes são mantidos)')){S.disciplinas.splice(el.dataset.i,1);save();render()}},
+  exportBackup(){const blob=new Blob([JSON.stringify(S,null,1)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='metodo-procuradoria-backup-'+today()+'.json';document.body.appendChild(a);a.click();a.remove();S.lastBackup=today();save();render();toast('Backup exportado')},
+  loadDemo(){loadDemo()},rmDemo(){S.topics=S.topics.filter(t=>!t.demo);['logs','sessoes','erros','leituras','eventos'].forEach(k=>S[k]=S[k].filter(x=>!x.demo));save();render();toast('Exemplos removidos')},
+  resetAll(){if(confirm('Apagar TODOS os dados deste navegador? Esta ação não pode ser desfeita.')&&confirm('Tem certeza? Exporte um backup antes se não tiver certeza.')){S=fresh();save();render()}},
+  /* prova */
+  examDue(){startExam(examIds(null,20))},
+  examBuild(){startExam(examIds(null,Number($('#limIn').value)||20))},
+  examTopic(el){startExam(dueCards().filter(x=>x.t.id===el.dataset.id).map(x=>x.c.id))},
+  examFree(){let a=allCards();if(F('rd'))a=a.filter(x=>x.t.disc===F('rd'));if(F('re'))a=a.filter(x=>String(escOf(x.t.disc))===F('re'));const lim=Number(F('lim'))||20;a=a.map(x=>({x,r:Math.random()})).sort((p,q)=>p.r-q.r).slice(0,lim).map(o=>o.x.c.id);startExam(a,false)},
+  examResume(){render()},
+  exGo(el){S.exam.idx=Number(el.dataset.i);save();renderExam()},
+  exPrev(){S.exam.idx=Math.max(0,S.exam.idx-1);save();renderExam()},
+  exNext(){S.exam.idx=Math.min(S.exam.ids.length-1,S.exam.idx+1);save();renderExam()},
+  exFlag(el){const E=S.exam;E.flag[E.ids[E.idx]]=el.checked;save();renderExam()},
+  exFinish(){const E=S.exam;const blank=E.ids.filter(id=>!(E.resp[id]||'').trim()).length;if(blank&&!confirm(blank+' pergunta(s) em branco. Entregar mesmo assim?'))return;E.fase='correcao';E.idx=0;save();renderExam()},
+  exMark(el){const E=S.exam;E.marks[E.ids[E.idx]]=el.dataset.m;save();if(E.idx<E.ids.length-1&&!E.ids.every(i=>E.marks[i]))E.idx++;renderExam()},
+  exCancel(){if(confirm('Sair e descartar esta prova?')){S.exam=null;save();render()}},
+  exDone(){
+    const E=S.exam;if(!E.ids.every(id=>E.marks[id]))return;
+    const res=[];let discs=new Set();
+    E.ids.forEach(id=>{const f=findCard(id);const m=E.marks[id];discs.add(f.t.disc);const before=f.c.nivel;if(E.aplicar)applyMark(f.c,m);const n=nextState(Object.assign({},f.c,E.aplicar?{}:{}),m);res.push({t:f.t,c:f.c,m,before,after:E.aplicar?f.c.nivel:n.nv,prox:E.aplicar?f.c.prox:n.prox})});
+    const min=Math.max(1,Math.round((Date.now()-E.inicio)/60000));
+    if(E.aplicar)S.sessoes.push({id:uid(),data:today(),disc:discs.size===1?[...discs][0]:'Misto',min,tipo:'AR (revisão)',nota:''});
+    const mainT=res[0].t;S.exam=null;save();render();
+    const cnt=k=>res.filter(r=>r.m===k).length;
+    openModal('<h2>Revisão concluída</h2><div class="row"><div class="kpi"><div class="l">Acertos</div><div class="v good">'+cnt('g')+'</div></div><div class="kpi"><div class="l">Parciais</div><div class="v warn">'+cnt('y')+'</div></div><div class="kpi"><div class="l">Erros</div><div class="v bad">'+(cnt('r')+cnt('x'))+'</div></div><div class="kpi"><div class="l">Tempo</div><div class="v">'+min+'min</div></div></div>'+(E.aplicar?'<p class="small muted">Próximas datas já agendadas e '+min+' min lançados em Horas.</p>':'<p class="small muted">Treino livre — agendamento não alterado.</p>')+
+    '<div class="tw" style="max-height:260px"><table><tr><th>Assunto</th><th>Resultado</th><th>Próxima</th></tr>'+res.map(r=>'<tr><td>'+esc(r.t.assunto)+'<div class="small muted">'+esc(r.c.q.slice(0,60))+(r.c.q.length>60?'…':'')+'</div></td><td>'+({g:'🟢',y:'🟡',r:'🔴',x:'⚠'})[r.m]+' AR'+r.before+' → AR'+r.after+'</td><td>'+br(r.prox)+'</td></tr>').join('')+'</table></div><p class="small" style="margin-bottom:0">Método: depois da recuperação, faça algumas <b>questões objetivas</b> do assunto.</p><div class="mfoot"><button class="btn" data-act="closeModal">Fechar</button><button class="btn primary" data-act="postLog" data-id="'+mainT.id+'">Registrar questões objetivas</button></div>');
+  },
+  postLog(el){const t=S.topics.find(x=>x.id===el.dataset.id);openLog({disc:t.disc,assunto:t.assunto,origem:'Pós-revisão'})}
+};
+document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if(!el||el.tagName==='INPUT'&&el.type==='checkbox')return;const f=ACT[el.dataset.act];if(f)f(el,e)});
+document.addEventListener('change',e=>{const el=e.target;if(el.dataset&&el.dataset.act&&(el.type==='checkbox'||el.tagName==='SELECT')){const f=ACT[el.dataset.act];if(f)f(el,e)}if(el.id==='impFile'){const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result);if(!o.topics||!o.settings)throw 0;if(confirm('Importar substitui os dados atuais deste navegador. Continuar?')){S=migrate(o);save();render();toast('Backup importado')}}catch(x){toast('Arquivo inválido')}};r.readAsText(el.files[0])}});
+document.addEventListener('input',e=>{const k=e.target.dataset&&e.target.dataset.filter;if(k!==undefined&&k!==''){UI.f[k]=e.target.value;render()}});
+document.addEventListener('submit',e=>{const a=e.target.dataset.submit;if(!a)return;e.preventDefault();const fd=new FormData(e.target);const T={
+  saveTopic,saveLog,saveErro,saveSim,saveLeitura,saveEvento,saveLote,
+  addSessao(f){S.sessoes.push({id:uid(),data:fd.get('data'),disc:fd.get('disc'),min:Number(fd.get('min')),tipo:fd.get('tipo'),nota:''});save();render();toast('Lançado')},
+  addTreino(){const min=Number(fd.get('min'))||0;S.treinos.push({id:uid(),data:fd.get('data'),disc:fd.get('disc'),tema:fd.get('tema'),tipo:fd.get('tipo'),min,nota:fd.get('nota')===''?'':Number(fd.get('nota')),obs:fd.get('obs'),stage:S.settings.stage});if(min>0)S.sessoes.push({id:uid(),data:fd.get('data'),disc:fd.get('disc'),min,tipo:'Segunda fase',nota:fd.get('tema')});save();render();toast('Treino salvo')},
+  saveCfg(){const s=S.settings;s.stage=Number(fd.get('stage'));s.meta=Number(fd.get('meta'))||85;s.amostra=Number(fd.get('amostra'))||100;s.horasSemana=Number(fd.get('horasSemana'))||25;save();render();toast('Preferências salvas')},
+  addDisc(){const n=String(fd.get('n')).trim();if(!n||S.disciplinas.some(d=>d.n===n))return toast('Nome inválido ou já existente');S.disciplinas.push({n,e:Number(fd.get('e'))});save();render()}
+};if(T[a])T[a](e.target)});
+
+/* ============ exemplo ============ */
+function loadDemo(){
+  const T0=today();const d=n=>addDays(T0,n);
+  const mk=(disc,assunto,estudo,cards)=>({id:uid(),demo:true,disc,assunto,status:'estudado',estudo,previsto:'',notas:'',d2Date:addDays(estudo,2),d2Done:true,cards:cards.map(([q,a,nivel,prox,hist])=>newCard({q,a,nivel,prox,verdes:0,hist:hist||[]}))});
+  S.topics.push(mk('Administrativo','Poder de polícia (exemplo)',d(-31),[
+   ['Conceitue poder de polícia e indique seus atributos.','Conceito/regra: atividade estatal que limita direitos individuais em prol do interesse público.\nFundamento legal: art. 78 do CTN.\nAtributos: discricionariedade, autoexecutoriedade, coercibilidade.\nJurisprudência: STF admite delegação a pessoas jurídicas de direito privado apenas quanto aos atos de consentimento e fiscalização.',30,d(-1)],
+   ['Diferencie polícia administrativa de polícia judiciária.','Administrativa: incide sobre bens, direitos e atividades, de caráter preventivo, regida pelo Direito Administrativo. Judiciária: incide sobre pessoas, repressiva, regida pelo Direito Processual Penal.',30,d(-1)],
+   ['O Município recebeu ação por interdição de estabelecimento. Como Procurador, quais teses defensivas?','Verificar competência municipal, motivação, devido processo legal, proporcionalidade e a presunção de legitimidade do ato.',60,d(0),[{d:d(-31),r:'y',de:30,para:60}]]]));
+  S.topics.push(mk('Tributário','Imunidades (exemplo)',d(-10),[
+   ['Quais são as imunidades genéricas do art. 150, VI, da CF?','Recíproca, templos, partidos/sindicatos/entidades de educação e assistência, livros/jornais/periódicos e papel, fonogramas e videofonogramas musicais.',30,d(20)]]));
+  S.topics.push({id:uid(),demo:true,disc:'Processo Civil',assunto:'Competência (exemplo)',status:'planejado',estudo:'',previsto:T0,notas:'',cards:[]});
+  const pts=[[-24,'Administrativo',20,13],[-20,'Constitucional',25,17],[-17,'Tributário',20,14],[-13,'Administrativo',30,22],[-10,'Processo Civil',20,16],[-7,'Constitucional',30,25],[-4,'Tributário',25,21],[-2,'Administrativo',30,26],[-1,'Financeiro',20,17],[-9,'Civil',20,13],[-3,'Trabalho',20,15]];
+  pts.forEach(([o,disc,total,a],i)=>S.logs.push({id:uid(),demo:true,ts:Date.now()+i,data:d(o),disc,assunto:disc+' (exemplo)',total,acertos:a,origem:'Avulso'}));
+  for(let i=0;i<7;i++)S.sessoes.push({id:uid(),demo:true,data:d(-i),disc:discNames()[i%5],min:90+((i*37)%120),tipo:TIPOS_H[i%4],nota:''});
+  S.erros.push({id:uid(),demo:true,qid:'Q123456 — Responsabilidade civil (exemplo)',disc:'Administrativo',assunto:'Responsabilidade civil',data:d(-3),status:'pendente',marcada:'C',certa:'B',logica:'',premissa:'',regra:'',gatilho:''});
+  S.leituras.push({id:uid(),demo:true,tipo:'leg',titulo:'Lei 14.133/2021 (exemplo)',ref:'arts. 1º a 25',disc:'Administrativo',url:'',previsto:T0,status:'pendente',lido:'',min:0,destaques:'Modalidades de licitação\nFase preparatória',notas:''},
+   {id:uid(),demo:true,tipo:'stf',titulo:'Informativo STF nº 1150 (exemplo)',ref:'',disc:'',url:'',previsto:d(-2),status:'pendente',lido:'',min:0,destaques:'',notas:''},
+   {id:uid(),demo:true,tipo:'stj',titulo:'Informativo STJ nº 850 (exemplo)',ref:'',disc:'',url:'',previsto:d(-1),status:'lido',lido:d(-1),min:25,destaques:'',notas:''});
+  S.eventos.push({id:uid(),demo:true,titulo:'Aula de Tributário (exemplo)',data:d(1),hora:'19:00',tipo:'Aula',nota:'',feito:false,serie:''},{id:uid(),demo:true,titulo:'Simulado PGM (exemplo)',data:d(5),hora:'',tipo:'Prova / simulado',nota:'',feito:false,serie:''});
+  save();render();toast('Exemplo carregado');
+}
+
+/* ============ render ============ */
+/* ============ leituras (legislação e informativos) ============ */
+const LT={leg:{l:'Legislação',i:'📜',c:'b'},stf:{l:'Informativo STF',i:'🏛️',c:'g'},stj:{l:'Informativo STJ',i:'⚖️',c:'y'}};
+const ltm=t=>LT[t]||LT.leg;
+const ltOpts=v=>opts(Object.entries(LT).map(([k,x])=>[k,x.l]),v);
+const ST_OPTS=[['pendente','Pendente'],['lendo','Lendo'],['lido','Lido']];
+const EV_TIPOS=['Compromisso','Aula','Prova / simulado','Prazo / edital','Lembrete','Outro'];
+const safeUrl=u=>/^https?:\/\//i.test(u||'')?u:'';
+const linkHtml=u=>safeUrl(u)?' <a href="'+esc(safeUrl(u))+'" target="_blank" rel="noopener">abrir ↗</a>':'';
+const MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const DSEM=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const DSEMF=['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'];
+const shiftMonth=(ym,n)=>{const [y,m]=ym.split('-').map(Number);const d=new Date(y,m-1+n,1,12);return d.getFullYear()+'-'+pad(d.getMonth()+1)};
+
+function syncLeituraSessao(l){
+  const i=S.sessoes.findIndex(s=>s.id===l.sessId);
+  if(l.status==='lido'&&l.min>0){
+    const s={id:l.sessId||uid(),data:l.lido||today(),disc:l.disc||'Misto',min:l.min,tipo:'Leitura',nota:l.titulo};
+    if(i>=0)S.sessoes[i]=s;else{l.sessId=s.id;S.sessoes.push(s)}
+  }else if(i>=0){S.sessoes.splice(i,1);l.sessId=''}
+}
+function openLeitura(id,preset){
+  const l=id?S.leituras.find(x=>x.id===id):Object.assign({id:'',tipo:'leg',titulo:'',ref:'',disc:'',url:'',previsto:'',status:'pendente',lido:'',min:0,destaques:'',notas:''},preset||{});
+  openModal('<h2>'+(id?'Editar leitura':'Nova leitura')+'</h2><form data-submit="saveLeitura"><input type="hidden" name="id" value="'+esc(l.id)+'">'+
+  '<div class="row"><div><label>Tipo</label><select name="tipo">'+ltOpts(l.tipo)+'</select></div><div style="flex:2"><label>Título / identificação</label><input name="titulo" value="'+esc(l.titulo)+'" placeholder="Ex.: Lei 14.133/2021 · Informativo STF nº 1150" required></div></div>'+
+  '<div class="row"><div style="flex:2"><label>Trecho / período (opcional)</label><input name="ref" value="'+esc(l.ref||'')+'" placeholder="Ex.: arts. 1º a 25 · julgados de 10 a 14/03"></div><div><label>Disciplina</label><select name="disc">'+opts(discNames(),l.disc,'— geral —')+'</select></div></div>'+
+  '<label>Link (opcional)</label><input name="url" value="'+esc(l.url||'')+'" placeholder="https://…">'+
+  '<div class="row"><div><label>Previsto para</label><input type="date" name="previsto" value="'+esc(l.previsto||'')+'"></div><div><label>Situação</label><select name="status">'+opts(ST_OPTS,l.status)+'</select></div><div><label>Lida em</label><input type="date" name="lido" value="'+esc(l.lido||'')+'"></div><div><label>Minutos gastos</label><input type="number" min="0" name="min" value="'+(l.min||'')+'"></div></div>'+
+  '<label>Destaques — um por linha (teses, artigos-chave, julgados)</label><textarea name="destaques" style="min-height:110px" placeholder="Ex.: Tema 1234 — responsabilidade subsidiária do Estado">'+esc(l.destaques||'')+'</textarea>'+
+  '<label>Notas</label><textarea name="notas" style="min-height:60px">'+esc(l.notas||'')+'</textarea>'+
+  '<div class="mfoot"><button type="button" class="btn" data-act="closeModal">Cancelar</button><button class="btn primary">Salvar</button></div></form>',true);
+}
+function saveLeitura(form){
+  const fd=new FormData(form);const id=fd.get('id');const titulo=String(fd.get('titulo')||'').trim();
+  if(!titulo){toast('Informe o título');return}
+  let l=id?S.leituras.find(x=>x.id===id):null;if(!l){l={id:uid(),criado:today()};S.leituras.push(l)}
+  l.tipo=fd.get('tipo')||'leg';l.titulo=titulo;l.ref=String(fd.get('ref')||'').trim();l.disc=fd.get('disc')||'';l.url=String(fd.get('url')||'').trim();l.previsto=fd.get('previsto')||'';
+  l.status=fd.get('status')||'pendente';
+  if(l.status==='lido')l.lido=fd.get('lido')||l.lido||today();else l.lido='';
+  l.min=Number(fd.get('min'))||0;l.destaques=String(fd.get('destaques')||'');l.notas=String(fd.get('notas')||'');
+  syncLeituraSessao(l);save();closeModal();render();toast('Leitura salva');
+}
+function openLote(){
+  openModal('<h2>Gerar sequência de informativos</h2><p class="muted small" style="margin:0">Cria um item por número, já com data prevista. Números já cadastrados são ignorados.</p><form data-submit="saveLote"><div class="row"><div><label>Tribunal</label><select name="tipo">'+opts([['stf','Informativo STF'],['stj','Informativo STJ']],'stf')+'</select></div><div><label>Do nº</label><input type="number" min="1" name="de" required></div><div><label>Até o nº</label><input type="number" min="1" name="ate" required></div></div><div class="row"><div><label>Primeira leitura em</label><input type="date" name="ini" value="'+today()+'"></div><div><label>Dias entre leituras</label><input type="number" min="0" name="passo" value="1"></div></div><div class="mfoot"><button type="button" class="btn" data-act="closeModal">Cancelar</button><button class="btn primary">Gerar</button></div></form>');
+}
+function saveLote(form){
+  const fd=new FormData(form);const tipo=fd.get('tipo')==='stj'?'stj':'stf';const de=Number(fd.get('de')),ate=Number(fd.get('ate'));
+  const passo=Math.max(0,Number(fd.get('passo')));const ini=fd.get('ini')||today();
+  if(!de||!ate||ate<de){toast('Confira a faixa de números');return}
+  if(ate-de>=200){toast('Máximo de 200 informativos por vez');return}
+  let k=0,add=0;
+  for(let n=de;n<=ate;n++){
+    const titulo='Informativo '+(tipo==='stf'?'STF':'STJ')+' nº '+n;
+    if(S.leituras.some(l=>l.tipo===tipo&&l.titulo===titulo))continue;
+    S.leituras.push({id:uid(),criado:today(),tipo,titulo,ref:'',disc:'',url:'',previsto:addDays(ini,k*passo),status:'pendente',lido:'',min:0,destaques:'',notas:''});k++;add++;
+  }
+  save();closeModal();render();toast(add+' informativo(s) criado(s)');
+}
+function vLeituras(){
+  const T0=today(),tab=F('lt');
+  let list=S.leituras.slice();
+  if(tab)list=list.filter(l=>l.tipo===tab);
+  if(F('ld'))list=list.filter(l=>l.disc===F('ld'));
+  if(F('ls'))list=list.filter(l=>l.status===F('ls'));
+  if(F('lq'))list=list.filter(l=>(l.titulo+' '+(l.ref||'')+' '+(l.destaques||'')+' '+(l.notas||'')).toLowerCase().includes(F('lq').toLowerCase()));
+  const rk=l=>l.status==='lido'?1:0;
+  list.sort((a,b)=>rk(a)-rk(b)||(rk(a)?(b.lido||'').localeCompare(a.lido||''):(a.previsto||'9999').localeCompare(b.previsto||'9999')));
+  const lidas=S.leituras.filter(l=>l.status==='lido');
+  const pend=S.leituras.filter(l=>l.status!=='lido');
+  const atras=pend.filter(l=>l.previsto&&l.previsto<T0).length;
+  const n7=lidas.filter(l=>l.lido>=addDays(T0,-6)).length,nm=lidas.filter(l=>l.lido>=T0.slice(0,8)+'01').length;
+  const cnt=t=>lidas.filter(l=>l.tipo===t).length;
+  let h='<div class="grid g4">'+kpi('Pendentes',pend.length,atras?atras+' atrasada(s)':'em dia',atras?'bad':'good')+kpi('Lidas (7 dias)',n7,'no mês: '+nm)+kpi('Informativos lidos','STF '+cnt('stf')+' · STJ '+cnt('stj'),'total acumulado')+kpi('Legislação lida',cnt('leg'),'itens concluídos')+'</div>';
+  h+='<div class="tabs">'+[['','Todas'],['leg','📜 Legislação'],['stf','🏛️ Informativos STF'],['stj','⚖️ Informativos STJ']].map(([v,l])=>'<a data-act="ltab" data-v="'+v+'" class="'+(tab===v?'on':'')+'">'+l+'</a>').join('')+'</div>';
+  h+='<div class="filters">'+fsel('ld',discNames(),'Todas as disciplinas')+fsel('ls',ST_OPTS,'Qualquer situação')+'<input id="lqIn" data-filter="lq" placeholder="Buscar…" value="'+esc(F('lq'))+'"><span style="flex:1"></span><button class="btn" data-act="loteLeitura">+ Sequência de informativos</button><button class="btn primary" data-act="newLeitura">+ Nova leitura</button></div>';
+  h+='<div class="card">'+(list.length?'<div class="tw"><table><tr><th>Tipo</th><th>Leitura</th><th>Disciplina</th><th>Previsto</th><th>Situação</th><th>Destaques</th><th></th></tr>'+list.map(l=>{
+    const m=ltm(l.tipo);const od=l.status!=='lido'&&l.previsto&&l.previsto<T0;
+    const nd=String(l.destaques||'').split('\n').filter(s=>s.trim()).length;
+    return'<tr><td><span class="badge '+m.c+'">'+m.i+' '+m.l+'</span></td><td><b>'+esc(l.titulo)+'</b>'+(l.ref?'<div class="small muted">'+esc(l.ref)+'</div>':'')+linkHtml(l.url)+'</td><td>'+esc(l.disc||'—')+'</td><td class="'+(od?'bad':'')+'">'+br(l.previsto)+'</td><td>'+(l.status==='lido'?'<span class="badge g">lido '+brShort(l.lido)+'</span>':l.status==='lendo'?'<span class="badge b">lendo</span>':'<span class="badge m">pendente</span>')+'</td><td>'+(nd||'—')+'</td><td style="white-space:nowrap;text-align:right">'+(l.status!=='lido'?'<button class="btn sm g" data-act="leituraLido" data-id="'+l.id+'">✔ Lida</button> ':'')+(nd?'<button class="btn sm" data-act="leituraAR" data-id="'+l.id+'" title="Transformar destaques em perguntas do AR">→ AR</button> ':'')+'<button class="btn sm" data-act="editLeitura" data-id="'+l.id+'">Editar</button> <button class="btn sm danger" data-act="delLeitura" data-id="'+l.id+'">×</button></td></tr>'}).join('')+'</table></div>':emptyBox(S.leituras.length?'Nenhuma leitura com esses filtros.':'Nenhuma leitura cadastrada. Use “+ Nova leitura” ou gere uma sequência de informativos.'))+'</div>';
+  return h;
+}
+function agendaHojeHtml(){
+  const T0=today();const by=(a,b)=>(a.hora||'99:99').localeCompare(b.hora||'99:99');
+  const ev=S.eventos.filter(e=>e.data===T0).sort(by);
+  const prox=S.eventos.filter(e=>e.data>T0&&e.data<=addDays(T0,7)).sort((a,b)=>a.data.localeCompare(b.data)||by(a,b)).slice(0,4);
+  return'<div class="card" style="margin-bottom:14px"><h3>🗓️ Agenda de hoje <small>· <a href="#" data-act="nav" data-v="calendario">abrir calendário</a></small></h3>'+
+  (ev.length?ev.map(e=>'<div class="item"><input type="checkbox" data-act="eventoToggle" data-id="'+e.id+'" '+(e.feito?'checked':'')+' style="width:18px;flex:none"><div class="grow"><div class="t" style="'+(e.feito?'text-decoration:line-through;opacity:.6':'')+'">'+(e.hora?esc(e.hora)+' · ':'')+esc(e.titulo)+'</div><div class="small muted">'+esc(e.tipo)+'</div></div></div>').join(''):'<div class="small muted">Nenhum compromisso hoje.</div>')+
+  (prox.length?'<div class="small muted" style="margin-top:8px">Próximos 7 dias: '+prox.map(e=>brShort(e.data)+(e.hora?' '+esc(e.hora):'')+' '+esc(e.titulo)).join(' · ')+'</div>':'')+'</div>';
+}
+function leituraHojeHtml(){
+  const T0=today();
+  const L=S.leituras.filter(l=>l.status!=='lido'&&l.previsto&&l.previsto<=T0).sort((a,b)=>a.previsto.localeCompare(b.previsto)).slice(0,6);
+  return'<div class="card" style="margin-bottom:14px"><h3>📜 Leituras <small>(legislação e informativos) · <a href="#" data-act="nav" data-v="leituras">ver todas</a></small></h3>'+
+  (L.length?L.map(l=>'<div class="item"><div class="grow"><div class="t">'+esc(l.titulo)+linkHtml(l.url)+'</div><div class="small muted">'+ltm(l.tipo).l+(l.ref?' · '+esc(l.ref):'')+(l.disc?' · '+esc(l.disc):'')+(l.previsto<T0?' · <span class="bad">'+diffDays(T0,l.previsto)+'d de atraso</span>':'')+'</div></div><button class="btn sm g" data-act="leituraLido" data-id="'+l.id+'">✔ Lida</button></div>').join(''):emptyBox('Nenhuma leitura prevista para hoje.'))+'</div>';
+}
+
+/* ============ calendário ============ */
+function openEvento(id,data){
+  const e=id?S.eventos.find(x=>x.id===id):{id:'',titulo:'',data:data||today(),hora:'',tipo:'Compromisso',nota:''};
+  openModal('<h2>'+(id?'Editar compromisso':'Novo compromisso')+'</h2><form data-submit="saveEvento"><input type="hidden" name="id" value="'+esc(e.id)+'"><label>Título</label><input name="titulo" value="'+esc(e.titulo)+'" required placeholder="Ex.: Aula de Tributário · Simulado · Prazo de inscrição">'+
+  '<div class="row"><div><label>Data</label><input type="date" name="data" value="'+esc(e.data)+'" required></div><div><label>Hora (opcional)</label><input type="time" name="hora" value="'+esc(e.hora||'')+'"></div><div><label>Tipo</label><select name="tipo">'+opts(EV_TIPOS,e.tipo)+'</select></div></div>'+
+  (id?'':'<div class="row"><div><label>Repetir</label><select name="repetir">'+opts([['nao','Não repetir'],['semanal','Toda semana'],['diario','Todo dia']],'nao')+'</select></div><div><label>Repetir até (se vazio: ~6 meses semanal / 60 dias diário)</label><input type="date" name="ate"></div></div>')+
+  '<label>Nota</label><textarea name="nota" style="min-height:50px">'+esc(e.nota||'')+'</textarea><div class="mfoot"><button type="button" class="btn" data-act="closeModal">Cancelar</button><button class="btn primary">Salvar</button></div></form>');
+}
+function saveEvento(form){
+  const fd=new FormData(form);const id=fd.get('id');const titulo=String(fd.get('titulo')||'').trim();const data=fd.get('data');
+  if(!titulo||!data){toast('Informe título e data');return}
+  const hora=fd.get('hora')||'',tipo=fd.get('tipo')||'Compromisso',nota=String(fd.get('nota')||'');
+  if(id){const e=S.eventos.find(x=>x.id===id);if(e)Object.assign(e,{titulo,data,hora,tipo,nota})}
+  else{
+    const rep=fd.get('repetir')||'nao';const serie=rep!=='nao'?uid():'';
+    const lim=rep==='nao'?data:(fd.get('ate')||addDays(data,rep==='semanal'?175:60));
+    let d=data,n=0;
+    do{S.eventos.push({id:uid(),titulo,data:d,hora,tipo,nota,feito:false,serie});d=addDays(d,rep==='diario'?1:7);n++}while(rep!=='nao'&&d<=lim&&n<120);
+  }
+  save();closeModal();UI.cal.sel=data;UI.cal.m=data.slice(0,7);render();toast('Compromisso salvo');
+}
+function dayInfo(d,cards){
+  cards=cards||allCards();const T0=today();
+  const rev=d===T0?cards.filter(x=>x.c.prox&&x.c.prox<=d):d>T0?cards.filter(x=>x.c.prox===d):[];
+  const feitas=[];S.topics.forEach(t=>t.cards.forEach(c=>(c.hist||[]).forEach(h=>{if(h.d===d)feitas.push({t,c,h})})));
+  const d2=S.topics.filter(t=>t.status==='estudado'&&t.d2Date===d);
+  const logs=S.logs.filter(l=>l.data===d);
+  return{rev,feitas,d2,d2p:d2.filter(t=>!t.d2Done),
+    novos:S.topics.filter(t=>t.status==='planejado'&&t.previsto===d),
+    estud:S.topics.filter(t=>t.status==='estudado'&&t.estudo===d),
+    leit:S.leituras.filter(l=>l.previsto===d||(l.status==='lido'&&l.lido===d)),
+    eventos:S.eventos.filter(e=>e.data===d).sort((a,b)=>(a.hora||'99:99').localeCompare(b.hora||'99:99')),
+    aut:S.erros.filter(e=>e.status!=='concluido'&&addDays(e.data,1)===d),
+    sims:S.simulados.filter(s=>s.data===d),trs:S.treinos.filter(t=>t.data===d),
+    min:sumMin(d,d),qt:logs.reduce((a,l)=>a+l.total,0),qa:logs.reduce((a,l)=>a+l.acertos,0)};
+}
+function chipsHtml(x,d){
+  const T0=today(),late=d<T0,c=[];const add=(cl,t)=>c.push('<span class="chip '+cl+'">'+t+'</span>');
+  if(x.rev.length)add(d<=T0?'r':'','🔁 '+x.rev.length);
+  if(x.feitas.length&&d<=T0)add('g','✔ '+x.feitas.length);
+  if(x.novos.length)add(late?'r':'b','📘 '+x.novos.length);
+  if(x.d2p.length)add(late?'r':'y','🎯 '+x.d2p.length);
+  if(x.leit.length)add(x.leit.every(l=>l.status==='lido')?'g':(late?'r':'b'),'📜 '+x.leit.length);
+  if(x.aut.length)add('y','🧠 '+x.aut.length);
+  if(x.sims.length)add('b','🏁');
+  if(x.trs.length)add('b','✍️');
+  return c.length?'<div>'+c.join('')+'</div>':'';
+}
+function evHtml(x){
+  const e=x.eventos;if(!e.length)return'';
+  return e.slice(0,2).map(v=>'<div class="cal-ev'+(v.feito?' done':'')+'">'+(v.hora?esc(v.hora)+' ':'')+esc(v.titulo)+'</div>').join('')+(e.length>2?'<div class="small muted">+'+(e.length-2)+' mais</div>':'');
+}
+function dayDetail(d){
+  const T0=today(),x=dayInfo(d);
+  const rel=d===T0?'Hoje':d===addDays(T0,1)?'Amanhã':d===addDays(T0,-1)?'Ontem':'';
+  let h='<div class="card"><div class="row" style="align-items:center"><h3 style="margin:0;flex:2">'+DSEMF[parse(d).getDay()]+', '+br(d)+(rel?' <small>· '+rel+'</small>':'')+'</h3><div class="auto"><button class="btn sm primary" data-act="newEvento" data-d="'+d+'">+ Agendar</button></div></div>';
+  let any=false;const sec=(t,body)=>{any=true;h+='<h3 style="margin:14px 0 2px;font-size:13px">'+t+'</h3>'+body};
+  const grp=list=>{const g={};list.forEach(r=>{const o=(g[r.t.id]=g[r.t.id]||{t:r.t,n:0,lv:new Set(),res:[]});o.n++;if(r.c)o.lv.add('AR'+r.c.nivel);if(r.h)o.res.push(({g:'🟢',y:'🟡',r:'🔴',x:'⚠'})[r.h.r]||'')});return Object.values(g)};
+  if(x.eventos.length)sec('Compromissos',x.eventos.map(e=>'<div class="item"><input type="checkbox" data-act="eventoToggle" data-id="'+e.id+'" '+(e.feito?'checked':'')+' style="width:18px;flex:none"><div class="grow"><div class="t" style="'+(e.feito?'text-decoration:line-through;opacity:.6':'')+'">'+(e.hora?esc(e.hora)+' · ':'')+esc(e.titulo)+'</div><div class="small muted">'+esc(e.tipo)+(e.nota?' · '+esc(e.nota):'')+'</div></div><button class="btn sm" data-act="editEvento" data-id="'+e.id+'">Editar</button><button class="btn sm danger" data-act="delEvento" data-id="'+e.id+'">×</button>'+(e.serie?'<button class="btn sm danger" data-act="delSerie" data-id="'+e.id+'" title="Excluir toda a série">série ×</button>':'')+'</div>').join(''));
+  if(x.rev.length)sec((d===T0?'Revisões vencidas':'Revisões agendadas')+' ('+x.rev.length+')',grp(x.rev.map(c=>({t:c.t,c:c.c}))).map(g=>'<div class="item"><div class="grow"><div class="t">'+esc(g.t.assunto)+'</div><div class="small muted">'+esc(g.t.disc)+' · '+g.n+' pergunta(s) · '+[...g.lv].join(', ')+'</div></div>'+(d===T0?'<button class="btn sm primary" data-act="examTopic" data-id="'+g.t.id+'">Fazer prova</button>':'')+'</div>').join(''));
+  if(x.feitas.length&&d<=T0)sec('Revisões feitas ('+x.feitas.length+')',grp(x.feitas).map(g=>'<div class="item"><div class="grow"><div class="t">'+esc(g.t.assunto)+'</div><div class="small muted">'+esc(g.t.disc)+'</div></div><span>'+g.res.join('')+'</span></div>').join(''));
+  if(x.novos.length)sec('Conteúdo novo previsto',x.novos.map(t=>'<div class="item"><div class="grow"><div class="t">'+esc(t.assunto)+'</div><div class="small muted">'+esc(t.disc)+'</div></div>'+(d<=T0?'<button class="btn sm" data-act="studied" data-id="'+t.id+'">Estudei</button>':'')+'</div>').join(''));
+  if(x.estud.length)sec('Estudado neste dia',x.estud.map(t=>'<div class="item"><div class="grow"><div class="t">'+esc(t.assunto)+'</div><div class="small muted">'+esc(t.disc)+' · '+t.cards.length+' pergunta(s)</div></div><span class="badge g">feito</span></div>').join(''));
+  if(x.d2.length)sec('Questões D+2',x.d2.map(t=>'<div class="item"><div class="grow"><div class="t">'+esc(t.assunto)+'</div><div class="small muted">'+esc(t.disc)+'</div></div>'+(t.d2Done?'<span class="badge g">feito</span>':(d<=T0?'<button class="btn sm primary" data-act="d2log" data-id="'+t.id+'">Registrar</button>':'<span class="badge m">agendado</span>'))+'</div>').join(''));
+  if(x.leit.length)sec('Leituras',x.leit.map(l=>'<div class="item"><div class="grow"><div class="t">'+esc(l.titulo)+linkHtml(l.url)+'</div><div class="small muted">'+ltm(l.tipo).l+(l.ref?' · '+esc(l.ref):'')+'</div></div>'+(l.status==='lido'?'<span class="badge g">lida</span>':'<button class="btn sm g" data-act="leituraLido" data-id="'+l.id+'">✔ Lida</button>')+'<button class="btn sm" data-act="editLeitura" data-id="'+l.id+'">Editar</button></div>').join(''));
+  if(x.aut.length)sec('Autópsias liberadas',x.aut.map(e=>'<div class="item"><div class="grow"><div class="t">'+esc(e.qid)+'</div><div class="small muted">'+esc(e.disc)+' · '+esc(e.assunto)+'</div></div><button class="btn sm" data-act="erro" data-id="'+e.id+'">Autópsia</button></div>').join(''));
+  if(x.sims.length)sec('Simulados',x.sims.map(s=>{const t=s.rows.reduce((a,r)=>a+r.total,0),a=s.rows.reduce((q,r)=>q+r.acertos,0);return'<div class="item"><div class="grow"><div class="t">'+esc(s.nome)+'</div></div><b class="'+cls(pct(a,t))+'">'+pct(a,t)+'%</b></div>'}).join(''));
+  if(x.trs.length)sec('Segunda fase',x.trs.map(t=>'<div class="item"><div class="grow"><div class="t">'+esc(t.tema)+'</div><div class="small muted">'+esc(t.tipo)+(t.min?' · '+t.min+' min':'')+'</div></div>'+(t.nota!==''?'<b>'+t.nota+'</b>':'')+'</div>').join(''));
+  if(!any)h+='<div class="empty" style="margin-top:12px">Nada agendado neste dia.</div>';
+  if(d<=T0&&(x.min||x.qt))h+='<div class="small muted" style="margin-top:14px;border-top:1px solid var(--border);padding-top:8px">Resumo do dia: '+(x.min?'<b>'+fmtH(x.min)+'</b> estudadas':'')+(x.min&&x.qt?' · ':'')+(x.qt?'<b>'+x.qa+'/'+x.qt+'</b> questões ('+pct(x.qa,x.qt)+'%)':'')+'</div>';
+  return h+'</div>';
+}
+function vCalendario(){
+  const T0=today(),cal=UI.cal,ym=cal.m;
+  const [ano,mes]=ym.split('-').map(Number);
+  const first=ym+'-01',start=addDays(first,-parse(first).getDay()),cards=allCards();
+  let cells='';
+  for(let i=0;i<42;i++){
+    const d=addDays(start,i);if(i>=35&&d.slice(0,7)!==ym)break;
+    const x=dayInfo(d,cards);
+    cells+='<div class="cal-cell'+(d.slice(0,7)!==ym?' out':'')+(d===T0?' today':'')+(d===cal.sel?' sel':'')+'" data-act="calSel" data-d="'+d+'"><div class="cal-n">'+Number(d.slice(8))+'</div>'+chipsHtml(x,d)+evHtml(x)+'</div>';
+  }
+  let h='<div class="filters"><button class="btn" data-act="calNav" data-n="-1">‹</button><b style="font-size:16px;min-width:150px;text-align:center">'+MESES[mes-1]+' '+ano+'</b><button class="btn" data-act="calNav" data-n="1">›</button><button class="btn" data-act="calToday">Hoje</button><span style="flex:1"></span><button class="btn primary" data-act="newEvento" data-d="'+(cal.sel||T0)+'">+ Compromisso</button></div>';
+  h+='<div class="grid g21"><div class="card"><div class="cal-grid">'+DSEM.map(n=>'<div class="cal-dow">'+n+'</div>').join('')+cells+'</div><div class="small muted" style="margin-top:10px">🔁 revisões · ✔ revisões feitas · 📘 conteúdo novo · 🎯 questões D+2 · 📜 leituras · 🧠 autópsias · 🏁 simulado · ✍️ 2ª fase. <span class="bad">Vermelho</span> = vencido/atrasado.</div></div><div>'+dayDetail(cal.sel||T0)+'</div></div>';
+  return h;
+}
+function shiftSerieDel(id){const e=S.eventos.find(x=>x.id===id);return e&&e.serie?S.eventos.filter(x=>x.serie===e.serie).length:0}
+Object.assign(ACT,{
+  ltab(el){UI.f.lt=el.dataset.v;render()},
+  newLeitura(){openLeitura('',{tipo:F('lt')||'leg'})},
+  editLeitura(el){openLeitura(el.dataset.id)},
+  loteLeitura(){openLote()},
+  delLeitura(el){if(!confirm('Excluir esta leitura?'))return;const l=S.leituras.find(x=>x.id===el.dataset.id);if(l&&l.sessId)S.sessoes=S.sessoes.filter(s=>s.id!==l.sessId);S.leituras=S.leituras.filter(x=>x.id!==el.dataset.id);save();render()},
+  leituraLido(el){
+    const l=S.leituras.find(x=>x.id===el.dataset.id);if(!l)return;
+    const v=prompt('Quanto tempo você gastou nessa leitura? (minutos — deixe vazio para não lançar em Horas)',l.min||'');if(v===null)return;
+    l.status='lido';l.lido=today();l.min=Number(v)||0;syncLeituraSessao(l);save();render();toast('Leitura concluída ✔');
+  },
+  leituraAR(el){
+    const l=S.leituras.find(x=>x.id===el.dataset.id);if(!l)return;const m=ltm(l.tipo);
+    const lines=String(l.destaques||'').split('\n').map(s=>s.trim()).filter(Boolean);
+    const cards=lines.map(s=>newCard({q:l.tipo==='leg'?'O que dispõe '+l.titulo+(l.ref?' ('+l.ref+')':'')+' sobre: '+s+'?':'Qual o entendimento do '+(l.tipo==='stf'?'STF':'STJ')+' ('+l.titulo+') sobre: '+s+'?',a:''}));
+    openTopic(null,{disc:l.disc||discNames()[0],assunto:l.titulo+(l.ref?' — '+l.ref:''),status:'estudado',estudo:today(),notas:'Origem: '+m.l+(safeUrl(l.url)?' · '+safeUrl(l.url):''),cards});
+  },
+  calNav(el){UI.cal.m=shiftMonth(UI.cal.m,Number(el.dataset.n));render()},
+  calToday(){UI.cal={m:today().slice(0,7),sel:today()};render()},
+  calSel(el){UI.cal.sel=el.dataset.d;UI.cal.m=el.dataset.d.slice(0,7);render()},
+  newEvento(el){openEvento('',el&&el.dataset&&el.dataset.d)},
+  editEvento(el){openEvento(el.dataset.id)},
+  delEvento(el){if(!confirm('Excluir este compromisso?'))return;S.eventos=S.eventos.filter(e=>e.id!==el.dataset.id);save();render()},
+  delSerie(el){const n=shiftSerieDel(el.dataset.id);const e=S.eventos.find(x=>x.id===el.dataset.id);if(!e||!confirm('Excluir os '+n+' compromissos desta série?'))return;S.eventos=S.eventos.filter(x=>x.serie!==e.serie);save();render()},
+  eventoToggle(el){const e=S.eventos.find(x=>x.id===el.dataset.id);if(e){e.feito=el.checked;save();render()}}
+});
+
+/* ============ arquivo de dados no PC (salvamento automático) ============ */
+const FS={h:null,state:'none',timer:null,busy:false,dirty:false,err:'',last:0};
+const fsOK=()=>!!(window.showSaveFilePicker&&window.showOpenFilePicker&&window.indexedDB);
+const FSTYPES=[{description:'Dados do Método Procuradoria (JSON)',accept:{'application/json':['.json']}}];
+function idb(mode,fn){return new Promise((res,rej)=>{const r=indexedDB.open('mp-fs',1);r.onupgradeneeded=()=>r.result.createObjectStore('k');r.onerror=()=>rej(r.error);r.onsuccess=()=>{const tx=r.result.transaction('k',mode);const out=fn(tx.objectStore('k'));tx.oncomplete=()=>res(out&&out.result);tx.onerror=()=>rej(tx.error)}})}
+function fsSchedule(){if(FS.state!=='ok')return;clearTimeout(FS.timer);FS.timer=setTimeout(fsWrite,600)}
+async function fsWrite(){
+  if(FS.state!=='ok'||!FS.h)return;
+  if(FS.busy){FS.dirty=true;return}
+  FS.busy=true;
+  try{const w=await FS.h.createWritable();await w.write(JSON.stringify(S));await w.close();FS.last=Date.now();FS.err=''}
+  catch(e){FS.state='need';FS.err=e.message||String(e);render()}
+  finally{FS.busy=false}
+  if(FS.dirty){FS.dirty=false;fsSchedule()}
+}
+async function fsSync(){
+  try{
+    const f=await FS.h.getFile();const txt=await f.text();let o=null;
+    if(txt.trim()){try{o=JSON.parse(txt)}catch(e){FS.state='error';FS.err='O arquivo de dados está ilegível (não foi sobrescrito).';return}}
+    if(o&&o.topics&&o.settings&&(o.savedAt||0)>(S.savedAt||0)){
+      S=migrate(o);S.savedAt=o.savedAt;
+      try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
+      FS.state='ok';FS.err='';toast('Dados carregados do arquivo (versão mais recente)');
+    }else{FS.state='ok';FS.err='';await fsWrite()}
+  }catch(e){FS.state='need';FS.err=e.message||String(e)}
+}
+async function fsInit(){
+  if(!fsOK()){FS.state='unsupported';render();return}
+  try{FS.h=await idb('readonly',s=>s.get('h'))}catch(e){FS.h=null}
+  if(!FS.h){FS.state='none';render();return}
+  try{
+    const p=await FS.h.queryPermission({mode:'readwrite'});
+    if(p==='granted')await fsSync();else FS.state='need';
+  }catch(e){FS.state='need';FS.err=e.message||String(e)}
+  render();
+}
+Object.assign(ACT,{
+  async fsCreate(){
+    try{
+      const h=await showSaveFilePicker({suggestedName:'metodo-procuradoria-dados.json',types:FSTYPES});
+      FS.h=h;await idb('readwrite',s=>s.put(h,'h'));FS.state='ok';FS.err='';
+      await fsWrite();render();toast('Salvamento automático ativado em '+h.name);
+    }catch(e){if(e&&e.name!=='AbortError'){FS.err=e.message||String(e);render()}}
+  },
+  async fsOpen(){
+    try{
+      const [h]=await showOpenFilePicker({types:FSTYPES,multiple:false});
+      const perm=await h.requestPermission({mode:'readwrite'});if(perm!=='granted'){toast('Permissão de gravação negada');return}
+      const txt=await (await h.getFile()).text();let o=null;
+      try{o=JSON.parse(txt)}catch(e){}
+      if(!o||!o.topics||!o.settings){toast('Esse arquivo não é um arquivo de dados do app');return}
+      if(!confirm('Carregar os dados deste arquivo e substituir os dados atuais deste navegador?'))return;
+      S=migrate(o);S.savedAt=Math.max(o.savedAt||0,Date.now());
+      FS.h=h;await idb('readwrite',s=>s.put(h,'h'));FS.state='ok';FS.err='';
+      try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
+      await fsWrite();render();toast('Arquivo conectado e dados carregados');
+    }catch(e){if(e&&e.name!=='AbortError'){FS.err=e.message||String(e);render()}}
+  },
+  async fsReconnect(){
+    try{
+      const p=await FS.h.requestPermission({mode:'readwrite'});
+      if(p!=='granted'){toast('Permissão negada — clique em Reconectar e escolha “Permitir”');return}
+      await fsSync();render();
+    }catch(e){FS.err=e.message||String(e);render()}
+  },
+  async fsUnlink(){
+    if(!confirm('Parar de salvar neste arquivo? (os dados continuam no navegador e no arquivo atual)'))return;
+    try{await idb('readwrite',s=>s.delete('h'))}catch(e){}
+    FS.h=null;FS.state='none';render();
+  }
+});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&FS.state==='ok'){clearTimeout(FS.timer);fsWrite()}});
+function fsBanner(){
+  if(FS.state==='need')return'<div class="banner">💾 <span style="flex:1"><b>Reconecte o arquivo de dados</b> para carregar e salvar sua versão mais recente.'+(FS.err?' <span class="small">('+esc(FS.err)+')</span>':'')+'</span><button class="btn sm primary" data-act="fsReconnect">Reconectar</button></div>';
+  if(FS.state==='error')return'<div class="banner">⚠ <span style="flex:1">'+esc(FS.err)+'</span><button class="btn sm" data-act="nav" data-v="config">Configurações</button></div>';
+  if(FS.state==='none'&&UI.view==='dashboard'&&S.topics.length)return'<div class="banner">💾 <span style="flex:1">Ative o <b>salvamento automático em arquivo</b> para nunca perder dados e abrir sempre a versão mais atual.</span><button class="btn sm primary" data-act="nav" data-v="config">Ativar</button></div>';
+  return'';
+}
+function fsCard(){
+  let b;
+  if(FS.state==='unsupported')b='<p style="margin-top:0">Este navegador não permite gravar direto em arquivo. Abra o app no <b>Google Chrome</b> ou <b>Microsoft Edge</b> (no computador) para ativar o salvamento automático. Enquanto isso, use “Exportar backup”.</p>';
+  else if(FS.state==='ok')b='<p style="margin-top:0">✅ Salvando automaticamente em <b>'+esc(FS.h.name)+'</b>'+(FS.last?' · última gravação às '+new Date(FS.last).toLocaleTimeString('pt-BR'):'')+'.</p><p class="small muted">Ao abrir o app de novo, ele lê esse arquivo e usa a versão mais recente entre o arquivo e o navegador.</p><button class="btn sm danger" data-act="fsUnlink">Desconectar arquivo</button>';
+  else if(FS.state==='need')b='<p style="margin-top:0">Arquivo <b>'+esc(FS.h?FS.h.name:'')+'</b> conhecido, mas o navegador pede sua permissão a cada nova sessão.</p><button class="btn primary" data-act="fsReconnect">Reconectar e sincronizar</button> <button class="btn" data-act="fsUnlink">Desconectar</button>';
+  else if(FS.state==='error')b='<p style="margin-top:0" class="bad">'+esc(FS.err)+'</p><button class="btn" data-act="fsOpen">Abrir outro arquivo</button> <button class="btn" data-act="fsUnlink">Desconectar</button>';
+  else b='<p style="margin-top:0">Escolha uma pasta do seu PC (ex.: Documentos). O app cria um arquivo <code>.json</code> ali e <b>grava nele a cada alteração</b>. Na próxima vez que abrir o app, ele lê o arquivo e carrega a versão mais recente.</p><div class="row"><button class="btn primary auto" data-act="fsCreate">📁 Criar arquivo de dados</button><button class="btn auto" data-act="fsOpen">📂 Já tenho um arquivo de dados</button></div>'+(FS.err?'<p class="small bad">'+esc(FS.err)+'</p>':'');
+  return'<div class="card" style="margin-bottom:14px"><h3>💾 Arquivo de dados no PC <small>(salvamento automático)</small></h3>'+b+'</div>';
+}
+
+/* ============ sincronização com Google Drive ============ */
+const COLL=['topics','logs','erros','sessoes','simulados','treinos','leituras','eventos'];
+let DEFMETA=null;
+function hash(s){let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return (h>>>0).toString(36)+s.length.toString(36)}
+/* registra quando cada registro mudou e quais foram apagados (base da mesclagem) */
+function track(){
+  const now=Date.now();const M=S._m=S._m||{};const D=S._del=S._del||{};const seen=new Set(['__meta']);
+  COLL.forEach(c=>{S[c]=S[c]||[];S[c].forEach(r=>{if(!r.id)r.id=uid();seen.add(r.id);const h=hash(JSON.stringify(r));if(!M[r.id]||M[r.id].h!==h)M[r.id]={u:now,h}})});
+  if(DEFMETA===null){const f=fresh();DEFMETA=hash(JSON.stringify({settings:f.settings,disciplinas:f.disciplinas,checks:f.checks}))}
+  const mh=hash(JSON.stringify({settings:S.settings,disciplinas:S.disciplinas,checks:S.checks}));
+  if(!M.__meta||M.__meta.h!==mh)M.__meta={h:mh,u:mh===DEFMETA?0:now};
+  Object.keys(M).forEach(id=>{if(!seen.has(id)){D[id]=now;delete M[id]}});
+}
+function cloudDoc(){track();const d={v:1,savedAt:S.savedAt||Date.now(),settings:S.settings,disciplinas:S.disciplinas,checks:S.checks,_m:S._m,_del:S._del};COLL.forEach(c=>d[c]=S[c]);return d}
+function docSig(d){const m=d._m||{},x=d._del||{};return hash(JSON.stringify([Object.keys(m).sort().map(k=>[k,m[k].u,m[k].h]),Object.keys(x).sort().map(k=>[k,x[k]])]))}
+function mergeDocs(L,R){
+  const lm=L._m||{},rm=R._m||{},now=Date.now();
+  const del={};[L._del||{},R._del||{}].forEach(o=>{for(const k in o)del[k]=Math.max(del[k]||0,o[k])});
+  for(const k in del)if(now-del[k]>90*864e5)delete del[k];
+  const out={v:1,savedAt:Math.max(L.savedAt||0,R.savedAt||0),_m:{}};
+  const rWins=(au,ah,bu,bh)=>bu>au||(bu===au&&String(bh)>String(ah));
+  COLL.forEach(c=>{
+    const map=new Map();
+    (L[c]||[]).forEach(r=>{const m=lm[r.id]||{u:0,h:''};map.set(r.id,{r,u:m.u,h:m.h})});
+    (R[c]||[]).forEach(r=>{const m=rm[r.id]||{u:0,h:''};const cur=map.get(r.id);if(!cur)map.set(r.id,{r,u:m.u,h:m.h});else if(cur.h!==m.h&&rWins(cur.u,cur.h,m.u,m.h))map.set(r.id,{r,u:m.u,h:m.h})});
+    out[c]=[];
+    map.forEach((x,id)=>{if(del[id]>x.u)return;out[c].push(x.r);out._m[id]={u:x.u,h:x.h};delete del[id]});
+  });
+  const a=lm.__meta||{u:0,h:''},b=rm.__meta||{u:0,h:''};
+  const useR=a.h!==b.h&&rWins(a.u,a.h,b.u,b.h)&&!!R.settings;
+  const src=useR?R:L;out.settings=src.settings;out.disciplinas=src.disciplinas;out.checks=src.checks||{};out._m.__meta=useR?b:a;
+  out._del=del;
+  return out;
+}
+const DRKEY='mp-drive-v1';
+const DR={cid:'',fileId:'',last:0,state:'off',err:'',token:null,exp:0,busy:false,pending:false,applying:false,timer:null};
+const drOriginOK=()=>location.protocol==='https:'||location.hostname==='localhost'||location.hostname==='127.0.0.1';
+function drStore(){try{localStorage.setItem(DRKEY,JSON.stringify({cid:DR.cid,fileId:DR.fileId,last:DR.last}))}catch(e){}}
+function drLoad(){
+  try{const o=JSON.parse(localStorage.getItem(DRKEY)||'{}');DR.cid=o.cid||'';DR.fileId=o.fileId||'';DR.last=o.last||0}catch(e){}
+  try{const c=new URLSearchParams(location.search).get('cid');if(c&&/^[\w.-]+\.apps\.googleusercontent\.com$/.test(c)){DR.cid=c;drStore();history.replaceState(null,'',location.pathname)}}catch(e){}
+}
+const authErr=m=>Object.assign(new Error(m),{auth:true});
+function drLoadGis(){return new Promise((res,rej)=>{
+  if(window.google&&google.accounts&&google.accounts.oauth2)return res();
+  const s=document.createElement('script');s.src='https://accounts.google.com/gsi/client';s.async=true;s.onload=()=>res();s.onerror=()=>rej(new Error('offline'));document.head.appendChild(s);
+})}
+function drToken(interactive){
+  return new Promise((res,rej)=>{
+    if(DR.token&&Date.now()<DR.exp-60000)return res(DR.token);
+    drLoadGis().then(()=>{
+      let done=false;const fin=(f,v)=>{if(!done){done=true;clearTimeout(to);f(v)}};
+      const to=setTimeout(()=>fin(rej,authErr('timeout')),interactive?120000:15000);
+      const tc=google.accounts.oauth2.initTokenClient({client_id:DR.cid,scope:'https://www.googleapis.com/auth/drive.appdata',
+        callback:r=>{if(r.error)return fin(rej,authErr(r.error));DR.token=r.access_token;DR.exp=Date.now()+(Number(r.expires_in)||3600)*1000;fin(res,DR.token)},
+        error_callback:e=>fin(rej,authErr((e&&e.type)||'popup'))});
+      tc.requestAccessToken({prompt:interactive?'':'none'});
+    },rej);
+  });
+}
+async function drFetch(url,opt){
+  opt=opt||{};const t=await drToken(false);opt.headers=Object.assign({},opt.headers,{Authorization:'Bearer '+t});
+  let r=await fetch(url,opt);
+  if(r.status===401){DR.token=null;opt.headers.Authorization='Bearer '+await drToken(false);r=await fetch(url,opt)}
+  if(!r.ok){let d='';try{d=(await r.text()).slice(0,160)}catch(e){}const e=new Error('Drive '+r.status+(d?': '+d:''));e.status=r.status;if(r.status===401)e.auth=true;throw e}
+  return r;
+}
+const GA='https://www.googleapis.com/';
+async function drFind(){
+  if(DR.fileId){try{await drFetch(GA+'drive/v3/files/'+DR.fileId+'?fields=id');return DR.fileId}catch(e){if(e.status!==404)throw e;DR.fileId=''}}
+  const q=encodeURIComponent("name='metodo-procuradoria.json' and 'appDataFolder' in parents and trashed=false");
+  const r=await(await drFetch(GA+'drive/v3/files?spaces=appDataFolder&q='+q+'&fields=files(id,modifiedTime)&orderBy='+encodeURIComponent('modifiedTime desc'))).json();
+  return r.files&&r.files.length?r.files[0].id:'';
+}
+async function drCreate(doc){
+  const b='mpb'+uid();
+  const body='--'+b+'\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n'+JSON.stringify({name:'metodo-procuradoria.json',parents:['appDataFolder']})+'\r\n--'+b+'\r\nContent-Type: application/json\r\n\r\n'+JSON.stringify(doc)+'\r\n--'+b+'--';
+  const r=await drFetch(GA+'upload/drive/v3/files?uploadType=multipart&fields=id',{method:'POST',headers:{'Content-Type':'multipart/related; boundary='+b},body});
+  return (await r.json()).id;
+}
+const drUpdate=(id,doc)=>drFetch(GA+'upload/drive/v3/files/'+id+'?uploadType=media',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(doc)});
+const drDownload=async id=>(await drFetch(GA+'drive/v3/files/'+id+'?alt=media')).json();
+function applyMerged(m){
+  const keep={timer:S.timer,exam:S.exam,lastBackup:S.lastBackup};
+  S=migrate(Object.assign({},m,keep));S.savedAt=Date.now();
+  DR.applying=true;try{save()}finally{DR.applying=false}
+  if(!S.exam&&!$('#modal').classList.contains('on'))render();
+}
+async function driveSync(interactive){
+  if(!DR.cid||!drOriginOK())return;
+  if(DR.busy){DR.pending=true;return}
+  DR.busy=true;DR.state='sync';DR.err='';drChip();
+  try{
+    if(interactive)await drToken(true);
+    const id=await drFind();
+    const remote=id?await drDownload(id):null;
+    if(id&&!(remote&&Array.isArray(remote.topics)&&remote._m))throw new Error('O arquivo na nuvem está em formato inesperado (não foi alterado).');
+    const local=cloudDoc();
+    if(!id){DR.fileId=await drCreate(local)}
+    else{
+      DR.fileId=id;
+      const merged=mergeDocs(local,remote);const sm=docSig(merged);
+      if(sm!==docSig(local))applyMerged(merged);
+      if(sm!==docSig(remote))await drUpdate(id,cloudDoc());
+    }
+    DR.state='ok';DR.last=Date.now();drStore();
+  }catch(e){
+    DR.err=e.message||String(e);
+    DR.state=e.auth?'need':(e instanceof TypeError||e.message==='offline'||!navigator.onLine)?'offline':'error';
+    if(interactive&&DR.state==='need')toast('Não foi possível entrar no Google ('+DR.err+')');
+  }finally{
+    DR.busy=false;drChip();
+    if(UI.view==='config'&&!$('#modal').classList.contains('on')&&!S.exam)render();
+    if(DR.pending){DR.pending=false;driveSchedule()}
+  }
+}
+function driveSchedule(){
+  if(!DR.cid||DR.applying||!drOriginOK()||DR.state==='off'||DR.state==='need')return;
+  clearTimeout(DR.timer);DR.timer=setTimeout(()=>driveSync(false),4000);
+}
+const ago=t=>{if(!t)return'';const m=Math.round((Date.now()-t)/60000);return m<1?'agora':m<60?'há '+m+' min':'há '+Math.floor(m/60)+' h'};
+function drChip(){
+  const bn=$('#drBanner');if(bn)bn.innerHTML=drBanner();
+  const el=$('#syncChip');if(!el)return;
+  const a=(c,t,act,title)=>'<a class="badge '+c+'" data-act="'+act+'" title="'+esc(title||'')+'" style="cursor:pointer">'+t+'</a>';
+  const s=DR.state;
+  el.innerHTML=s==='sync'?a('b','☁️ sincronizando…','driveNow'):s==='ok'?a('g','☁️ sincronizado '+ago(DR.last),'driveNow','Clique para sincronizar agora'):s==='need'?a('y','☁️ entrar no Google','driveConnect'):s==='offline'?a('m','☁️ offline','driveNow','Sem conexão — os dados ficam salvos neste aparelho'):s==='error'?a('r','☁️ erro de sincronização','driveNow',DR.err):'';
+}
+function drBanner(){
+  if(DR.cid&&DR.state==='need')return'<div class="banner">☁️ <span style="flex:1"><b>Entre no Google</b> para sincronizar seus dados com os outros aparelhos.</span><button class="btn sm primary" data-act="driveConnect">Entrar</button></div>';
+  if(DR.cid&&DR.state==='error')return'<div class="banner">⚠ <span style="flex:1">Sincronização com o Drive: '+esc(DR.err)+'</span><button class="btn sm" data-act="driveNow">Tentar de novo</button></div>';
+  return'';
+}
+function driveCard(){
+  let b;
+  if(!drOriginOK())b='<p style="margin-top:0">A sincronização com o Google Drive só funciona quando o app está <b>hospedado num endereço https</b> (ex.: GitHub Pages) — você está abrindo como arquivo local. Depois de hospedar, abra o endereço no PC e no tablet e volte aqui.</p>';
+  else if(!DR.cid)b='<p style="margin-top:0">Cole abaixo o <b>ID do cliente OAuth</b> do Google (termina em <code>.apps.googleusercontent.com</code>). Você cria esse ID uma vez, de graça, no Google Cloud.</p><div class="row"><div style="flex:3"><input id="drCid" placeholder="123456789-abc….apps.googleusercontent.com"></div><div class="auto"><button class="btn primary" data-act="driveSaveCid">Salvar e entrar</button></div></div><details style="margin-top:10px"><summary class="small">Como criar o ID (≈10 min)</summary><ol class="small" style="padding-left:18px"><li>Acesse <b>console.cloud.google.com</b> e crie um projeto (ex.: “Método Procuradoria”).</li><li>Em <b>APIs e serviços → Biblioteca</b>, ative a <b>Google Drive API</b>.</li><li>Em <b>Tela de consentimento OAuth</b> (ou “Google Auth Platform”): tipo <b>Externo</b>, informe nome e seu e-mail; em <b>Escopos</b> adicione <code>…/auth/drive.appdata</code>; depois clique em <b>Publicar app</b> (“Em produção”).</li><li>Em <b>Credenciais → Criar credenciais → ID do cliente OAuth</b>: tipo <b>Aplicativo da Web</b>; em <b>Origens JavaScript autorizadas</b> coloque <code>'+esc(location.origin)+'</code> (só o endereço, sem barra no final).</li><li>Copie o <b>ID do cliente</b> e cole acima.</li></ol></details>';
+  else{
+    const st=DR.state;
+    b='<p style="margin-top:0">'+(st==='ok'?'✅ Sincronizado '+ago(DR.last)+'.':st==='sync'?'⏳ Sincronizando…':st==='need'?'⚠ É preciso entrar no Google neste aparelho.':st==='offline'?'📴 Sem conexão — vai sincronizar quando voltar.':st==='error'?'<span class="bad">'+esc(DR.err)+'</span>':'Conectado.')+'</p><p class="small muted">Os dados ficam numa pasta privada do app no seu Google Drive (não aparece na lista de arquivos). Alterações feitas nos dois aparelhos são <b>mescladas</b> automaticamente — a sincronização roda ao abrir o app, alguns segundos depois de cada alteração e a cada poucos minutos.</p><div class="row"><button class="btn primary auto" data-act="'+(st==='need'?'driveConnect':'driveNow')+'">'+(st==='need'?'Entrar no Google':'Sincronizar agora')+'</button><button class="btn auto" data-act="driveLink">🔗 Link para configurar outro aparelho</button><button class="btn auto danger" data-act="driveOff">Desconectar</button></div>';
+  }
+  return'<div class="card" style="margin-bottom:14px"><h3>☁️ Sincronização entre aparelhos <small>(Google Drive)</small></h3>'+b+'</div>';
+}
+Object.assign(ACT,{
+  driveSaveCid(){const v=($('#drCid').value||'').trim();if(!/^[\w.-]+\.apps\.googleusercontent\.com$/.test(v)){toast('ID inválido — deve terminar em .apps.googleusercontent.com');return}DR.cid=v;DR.state='need';drStore();render();driveSync(true)},
+  driveConnect(){driveSync(true)},
+  driveNow(){driveSync(DR.state==='need')},
+  driveLink(){const u=location.origin+location.pathname+'?cid='+encodeURIComponent(DR.cid);if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(u).then(()=>toast('Link copiado — abra-o no outro aparelho'),()=>prompt('Copie o link:',u));else prompt('Copie o link:',u)},
+  driveOff(){if(!confirm('Desconectar deste aparelho? Os dados na nuvem e neste aparelho continuam; só para de sincronizar.'))return;DR.cid='';DR.token=null;DR.fileId='';DR.state='off';drStore();drChip();render()}
+});
+async function driveInit(){
+  drLoad();
+  if(!DR.cid||!drOriginOK()){DR.state='off';drChip();return}
+  DR.state='need';drLoadGis().catch(()=>{});
+  await driveSync(false);
+}
+setInterval(()=>{drChip();if(DR.state==='ok'&&document.visibilityState==='visible'&&Date.now()-DR.last>180000)driveSync(false)},60000);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&DR.state==='ok'&&Date.now()-DR.last>30000)driveSync(false)});
+window.addEventListener('online',()=>{if(DR.cid&&DR.state==='offline')driveSync(false)});
+
+function applyTheme(){const t=S.settings.tema;document.documentElement.dataset.theme=t==='auto'?(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):t}
+function render(){
+  const fa=document.activeElement,fid=fa&&fa.id,pos=fa&&fa.selectionStart;
+  const nd=dueCards().length;
+  $('#nav').innerHTML=Object.entries(VIEWS).map(([k,v])=>'<a data-act="nav" data-v="'+k+'" class="'+(UI.view===k?'on':'')+'">'+v.i+' '+v.t+(k==='hoje'&&nd?'<span class="nb">'+nd+'</span>':'')+'</a>').join('');
+  $('#title').textContent=VIEWS[UI.view].t;
+  $('#main').innerHTML=fsBanner()+VIEWS[UI.view].r();
+  $('#timerChip').innerHTML=S.timer?'<span class="badge r">● <span class="tc">'+fmtHMS(Date.now()-S.timer.start)+'</span> '+esc(S.timer.disc)+'</span>':'';
+  drChip();
+  if(fid){const n=document.getElementById(fid);if(n){n.focus();try{if(pos!=null)n.setSelectionRange(pos,pos)}catch(e){}}}
+  renderExam();
+}
+applyTheme();render();fsInit().then(driveInit,driveInit);
+if(drOriginOK()){try{const l=document.createElement('link');l.rel='manifest';l.href='manifest.webmanifest';document.head.appendChild(l);if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}}
+</script>
+</body>
+</html>
