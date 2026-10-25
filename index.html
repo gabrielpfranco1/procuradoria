@@ -939,7 +939,7 @@ function fsCard(){
   return'<div class="card" style="margin-bottom:14px"><h3>💾 Arquivo de dados no PC <small>(salvamento automático)</small></h3>'+b+'</div>';
 }
 
-/* ============ sincronização com Google Drive ============ */
+/* ============ sincronização na nuvem (GitHub ou Google Drive) ============ */
 const COLL=['topics','logs','erros','sessoes','simulados','treinos','leituras','eventos'];
 let DEFMETA=null;
 function hash(s){let h=5381;for(let i=0;i<s.length;i++)h=((h<<5)+h+s.charCodeAt(i))|0;return (h>>>0).toString(36)+s.length.toString(36)}
@@ -973,15 +973,31 @@ function mergeDocs(L,R){
   out._del=del;
   return out;
 }
-const DRKEY='mp-drive-v1';
-const DR={cid:'',fileId:'',last:0,state:'off',err:'',token:null,exp:0,busy:false,pending:false,applying:false,timer:null};
+
+/* ---- estado e configuração (por aparelho; nada disso vai para a nuvem) ---- */
+const DRKEY='mp-sync-v2',DRKEY1='mp-drive-v1',DRTOK='mp-drive-tok';
+const DR={mode:'',cid:'',fileId:'',email:'',last:0,state:'off',err:'',token:null,exp:0,busy:false,pending:false,applying:false,timer:null,auto:false,gh:{repo:'',token:''}};
+const GHPATH='metodo-procuradoria.json';
 const drOriginOK=()=>location.protocol==='https:'||location.hostname==='localhost'||location.hostname==='127.0.0.1';
-function drStore(){try{localStorage.setItem(DRKEY,JSON.stringify({cid:DR.cid,fileId:DR.fileId,last:DR.last}))}catch(e){}}
+const ghOK=()=>!!(DR.gh.repo&&DR.gh.token);
+const drReady=()=>DR.mode==='github'?ghOK():DR.mode==='drive'?!!DR.cid:false;
+function drStore(){try{localStorage.setItem(DRKEY,JSON.stringify({mode:DR.mode,cid:DR.cid,fileId:DR.fileId,email:DR.email,last:DR.last,gh:DR.gh}))}catch(e){}}
 function drLoad(){
-  try{const o=JSON.parse(localStorage.getItem(DRKEY)||'{}');DR.cid=o.cid||'';DR.fileId=o.fileId||'';DR.last=o.last||0}catch(e){}
-  try{const c=new URLSearchParams(location.search).get('cid');if(c&&/^[\w.-]+\.apps\.googleusercontent\.com$/.test(c)){DR.cid=c;drStore();history.replaceState(null,'',location.pathname)}}catch(e){}
+  try{
+    const o=JSON.parse(localStorage.getItem(DRKEY)||'null')||JSON.parse(localStorage.getItem(DRKEY1)||'{}');
+    DR.cid=o.cid||'';DR.fileId=o.fileId||'';DR.email=o.email||'';DR.last=o.last||0;DR.gh=Object.assign({repo:'',token:''},o.gh||{});DR.mode=o.mode||(DR.cid?'drive':'');
+  }catch(e){}
+  try{const t=JSON.parse(localStorage.getItem(DRTOK)||'null');if(t&&t.exp>Date.now()+60000){DR.token=t.t;DR.exp=t.exp}}catch(e){}
+  try{
+    const c=new URLSearchParams(location.search).get('cid');
+    if(c&&/^[\w.-]+\.apps\.googleusercontent\.com$/.test(c)){DR.cid=c;DR.mode='drive';drStore();history.replaceState(null,'',location.pathname)}
+    const m=/#gh=([^&]+)/.exec(location.hash);
+    if(m){const o=JSON.parse(atob(decodeURIComponent(m[1])));if(o.r&&o.t){DR.gh={repo:o.r,token:o.t};DR.mode='github';drStore()}history.replaceState(null,'',location.pathname+location.search)}
+  }catch(e){}
 }
 const authErr=m=>Object.assign(new Error(m),{auth:true});
+
+/* ---- Google Drive ---- */
 function drLoadGis(){return new Promise((res,rej)=>{
   if(window.google&&google.accounts&&google.accounts.oauth2)return res();
   const s=document.createElement('script');s.src='https://accounts.google.com/gsi/client';s.async=true;s.onload=()=>res();s.onerror=()=>rej(new Error('offline'));document.head.appendChild(s);
@@ -990,19 +1006,20 @@ function drToken(interactive){
   return new Promise((res,rej)=>{
     if(DR.token&&Date.now()<DR.exp-60000)return res(DR.token);
     drLoadGis().then(()=>{
-      let done=false;const fin=(f,v)=>{if(!done){done=true;clearTimeout(to);f(v)}};
-      const to=setTimeout(()=>fin(rej,authErr('timeout')),interactive?120000:15000);
+      let done=false,to=0;const fin=(f,v)=>{if(!done){done=true;clearTimeout(to);f(v)}};
+      to=setTimeout(()=>fin(rej,authErr('timeout')),interactive?120000:15000);
       const tc=google.accounts.oauth2.initTokenClient({client_id:DR.cid,scope:'https://www.googleapis.com/auth/drive.appdata',
-        callback:r=>{if(r.error)return fin(rej,authErr(r.error));DR.token=r.access_token;DR.exp=Date.now()+(Number(r.expires_in)||3600)*1000;fin(res,DR.token)},
+        callback:r=>{if(r.error)return fin(rej,authErr(r.error));DR.token=r.access_token;DR.exp=Date.now()+(Number(r.expires_in)||3600)*1000;try{localStorage.setItem(DRTOK,JSON.stringify({t:DR.token,exp:DR.exp}))}catch(e){}fin(res,DR.token)},
         error_callback:e=>fin(rej,authErr((e&&e.type)||'popup'))});
-      tc.requestAccessToken({prompt:interactive?'':'none'});
+      const o={prompt:interactive?'':'none'};if(DR.email)o.hint=DR.email;
+      tc.requestAccessToken(o);
     },rej);
   });
 }
 async function drFetch(url,opt){
   opt=opt||{};const t=await drToken(false);opt.headers=Object.assign({},opt.headers,{Authorization:'Bearer '+t});
   let r=await fetch(url,opt);
-  if(r.status===401){DR.token=null;opt.headers.Authorization='Bearer '+await drToken(false);r=await fetch(url,opt)}
+  if(r.status===401){DR.token=null;try{localStorage.removeItem(DRTOK)}catch(e){}opt.headers.Authorization='Bearer '+await drToken(false);r=await fetch(url,opt)}
   if(!r.ok){let d='';try{d=(await r.text()).slice(0,160)}catch(e){}const e=new Error('Drive '+r.status+(d?': '+d:''));e.status=r.status;if(r.status===401)e.auth=true;throw e}
   return r;
 }
@@ -1019,8 +1036,49 @@ async function drCreate(doc){
   const r=await drFetch(GA+'upload/drive/v3/files?uploadType=multipart&fields=id',{method:'POST',headers:{'Content-Type':'multipart/related; boundary='+b},body});
   return (await r.json()).id;
 }
-const drUpdate=(id,doc)=>drFetch(GA+'upload/drive/v3/files/'+id+'?uploadType=media',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(doc)});
-const drDownload=async id=>(await drFetch(GA+'drive/v3/files/'+id+'?alt=media')).json();
+const BKD={
+  async auth(interactive){
+    await drToken(interactive);
+    if(!DR.email){try{const j=await(await drFetch(GA+'drive/v3/about?fields=user(emailAddress)')).json();DR.email=(j.user&&j.user.emailAddress)||'';drStore()}catch(e){}}
+  },
+  async pull(){const id=await drFind();if(!id)return{remote:null,ver:''};DR.fileId=id;return{remote:await(await drFetch(GA+'drive/v3/files/'+id+'?alt=media')).json(),ver:id}},
+  async push(doc,ver){
+    if(ver)await drFetch(GA+'upload/drive/v3/files/'+ver+'?uploadType=media',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(doc)});
+    else DR.fileId=await drCreate(doc);
+  }
+};
+
+/* ---- GitHub (repositório privado + token; não pede login) ---- */
+function ghErr(s,t){
+  if(s===401)return authErr('Token do GitHub inválido ou expirado');
+  if(s===403)return new Error('GitHub recusou (403): confira se o token tem “Contents: Read and write” neste repositório'+(/rate limit/i.test(t||'')?' (limite de uso — tente mais tarde)':''));
+  if(s===404)return new Error('Repositório não encontrado — confira o nome (usuario/repositorio) e se o token tem acesso a ele');
+  return new Error('GitHub '+s+(t?': '+String(t).slice(0,120):''));
+}
+const ghH=extra=>Object.assign({Authorization:'Bearer '+DR.gh.token,Accept:'application/vnd.github+json'},extra||{});
+const ghU=()=>'https://api.github.com/repos/'+DR.gh.repo+'/contents/'+GHPATH;
+const b64enc=s=>{const b=new TextEncoder().encode(s);let o='';for(let i=0;i<b.length;i+=0x8000)o+=String.fromCharCode.apply(null,b.subarray(i,i+0x8000));return btoa(o)};
+const b64dec=s=>{const o=atob(String(s).replace(/\s/g,''));const b=new Uint8Array(o.length);for(let i=0;i<o.length;i++)b[i]=o.charCodeAt(i);return new TextDecoder().decode(b)};
+const BKG={
+  async auth(){if(!ghOK())throw authErr('Token do GitHub não configurado')},
+  async pull(){
+    const r=await fetch(ghU(),{headers:ghH(),cache:'no-store'});
+    if(r.status===404){const rr=await fetch('https://api.github.com/repos/'+DR.gh.repo,{headers:ghH(),cache:'no-store'});if(rr.ok)return{remote:null,ver:''};throw ghErr(rr.status===404?404:rr.status)}
+    if(!r.ok)throw ghErr(r.status,await r.text());
+    const j=await r.json();let txt;
+    if(j.content&&j.encoding==='base64')txt=b64dec(j.content);
+    else{const rw=await fetch(ghU(),{headers:ghH({Accept:'application/vnd.github.raw+json'}),cache:'no-store'});if(!rw.ok)throw ghErr(rw.status);txt=await rw.text()}
+    return{remote:JSON.parse(txt),ver:j.sha};
+  },
+  async push(doc,ver){
+    const body={message:'sync '+new Date().toISOString(),content:b64enc(JSON.stringify(doc))};if(ver)body.sha=ver;
+    const r=await fetch(ghU(),{method:'PUT',headers:ghH({'Content-Type':'application/json'}),body:JSON.stringify(body)});
+    if(r.status===409||r.status===422){throw Object.assign(new Error('conflito de versão'),{conflict:true})}
+    if(!r.ok)throw ghErr(r.status,await r.text());
+  }
+};
+
+/* ---- núcleo: puxa, mescla, aplica e envia ---- */
 function applyMerged(m){
   const keep={timer:S.timer,exam:S.exam,lastBackup:S.lastBackup};
   S=migrate(Object.assign({},m,keep));S.savedAt=Date.now();
@@ -1028,27 +1086,31 @@ function applyMerged(m){
   if(!S.exam&&!$('#modal').classList.contains('on'))render();
 }
 async function driveSync(interactive){
-  if(!DR.cid||!drOriginOK())return;
+  if(!drReady()||!drOriginOK())return;
   if(DR.busy){DR.pending=true;return}
   DR.busy=true;DR.state='sync';DR.err='';drChip();
   try{
-    if(interactive)await drToken(true);
-    const id=await drFind();
-    const remote=id?await drDownload(id):null;
-    if(id&&!(remote&&Array.isArray(remote.topics)&&remote._m))throw new Error('O arquivo na nuvem está em formato inesperado (não foi alterado).');
-    const local=cloudDoc();
-    if(!id){DR.fileId=await drCreate(local)}
-    else{
-      DR.fileId=id;
-      const merged=mergeDocs(local,remote);const sm=docSig(merged);
-      if(sm!==docSig(local))applyMerged(merged);
-      if(sm!==docSig(remote))await drUpdate(id,cloudDoc());
+    const bk=DR.mode==='github'?BKG:BKD;
+    await bk.auth(interactive);
+    for(let tries=0;;tries++){
+      const{remote,ver}=await bk.pull();
+      if(remote&&!(Array.isArray(remote.topics)&&remote._m))throw new Error('O arquivo na nuvem está em formato inesperado (não foi alterado).');
+      const local=cloudDoc();
+      try{
+        if(!remote)await bk.push(local,'');
+        else{
+          const merged=mergeDocs(local,remote);const sm=docSig(merged);
+          if(sm!==docSig(local))applyMerged(merged);
+          if(sm!==docSig(remote))await bk.push(cloudDoc(),ver);
+        }
+        break;
+      }catch(e){if(e.conflict&&tries<3)continue;throw e}
     }
     DR.state='ok';DR.last=Date.now();drStore();
   }catch(e){
     DR.err=e.message||String(e);
     DR.state=e.auth?'need':(e instanceof TypeError||e.message==='offline'||!navigator.onLine)?'offline':'error';
-    if(interactive&&DR.state==='need')toast('Não foi possível entrar no Google ('+DR.err+')');
+    if(interactive&&DR.state==='need'&&DR.mode==='drive')toast('Não foi possível entrar no Google ('+DR.err+')');
   }finally{
     DR.busy=false;drChip();
     if(UI.view==='config'&&!$('#modal').classList.contains('on')&&!S.exam)render();
@@ -1056,48 +1118,93 @@ async function driveSync(interactive){
   }
 }
 function driveSchedule(){
-  if(!DR.cid||DR.applying||!drOriginOK()||DR.state==='off'||DR.state==='need')return;
+  if(!drReady()||DR.applying||!drOriginOK()||DR.state==='off'||DR.state==='need')return;
   clearTimeout(DR.timer);DR.timer=setTimeout(()=>driveSync(false),4000);
 }
+
+/* ---- interface ---- */
 const ago=t=>{if(!t)return'';const m=Math.round((Date.now()-t)/60000);return m<1?'agora':m<60?'há '+m+' min':'há '+Math.floor(m/60)+' h'};
 function drChip(){
   const bn=$('#drBanner');if(bn)bn.innerHTML=drBanner();
   const el=$('#syncChip');if(!el)return;
   const a=(c,t,act,title)=>'<a class="badge '+c+'" data-act="'+act+'" title="'+esc(title||'')+'" style="cursor:pointer">'+t+'</a>';
-  const s=DR.state;
-  el.innerHTML=s==='sync'?a('b','☁️ sincronizando…','driveNow'):s==='ok'?a('g','☁️ sincronizado '+ago(DR.last),'driveNow','Clique para sincronizar agora'):s==='need'?a('y','☁️ entrar no Google','driveConnect'):s==='offline'?a('m','☁️ offline','driveNow','Sem conexão — os dados ficam salvos neste aparelho'):s==='error'?a('r','☁️ erro de sincronização','driveNow',DR.err):'';
+  const s=DR.state,gh=DR.mode==='github';
+  el.innerHTML=!drReady()?'':s==='sync'?a('b','☁️ sincronizando…','driveNow'):s==='ok'?a('g','☁️ sincronizado '+ago(DR.last),'driveNow','Clique para sincronizar agora'):s==='need'?a('y',gh?'☁️ token inválido':'☁️ entrar no Google','driveFix'):s==='offline'?a('m','☁️ offline','driveNow','Sem conexão — os dados ficam salvos neste aparelho'):s==='error'?a('r','☁️ erro de sincronização','driveNow',DR.err):'';
 }
 function drBanner(){
-  if(DR.cid&&DR.state==='need')return'<div class="banner">☁️ <span style="flex:1"><b>Entre no Google</b> para sincronizar seus dados com os outros aparelhos.</span><button class="btn sm primary" data-act="driveConnect">Entrar</button></div>';
-  if(DR.cid&&DR.state==='error')return'<div class="banner">⚠ <span style="flex:1">Sincronização com o Drive: '+esc(DR.err)+'</span><button class="btn sm" data-act="driveNow">Tentar de novo</button></div>';
+  if(!drReady())return'';
+  if(DR.state==='need'&&DR.mode==='drive')return'<div class="banner">☁️ <span style="flex:1"><b>Entre no Google</b> para sincronizar seus dados com os outros aparelhos.</span><button class="btn sm primary" data-act="driveConnect">Entrar</button></div>';
+  if(DR.state==='need')return'<div class="banner">☁️ <span style="flex:1"><b>O token do GitHub é inválido ou expirou.</b> Gere outro e cole em Configurações.</span><button class="btn sm primary" data-act="driveFix">Abrir configurações</button></div>';
+  if(DR.state==='error')return'<div class="banner">⚠ <span style="flex:1">Sincronização: '+esc(DR.err)+'</span><button class="btn sm" data-act="driveNow">Tentar de novo</button></div>';
   return'';
 }
+function drStatusLine(){
+  const s=DR.state,gh=DR.mode==='github',who=gh?'GitHub':'Google Drive';
+  return s==='ok'?'✅ Sincronizado com o '+who+' '+ago(DR.last)+'.':s==='sync'?'⏳ Sincronizando…':s==='need'?(gh?'⚠ O token do GitHub é inválido ou expirou.':'⚠ É preciso entrar no Google neste aparelho.'):s==='offline'?'📴 Sem conexão — sincroniza quando voltar.':s==='error'?'<span class="bad">'+esc(DR.err)+'</span>':'Conectado.';
+}
 function driveCard(){
+  const card=b=>'<div class="card" style="margin-bottom:14px"><h3>☁️ Sincronização entre aparelhos</h3>'+b+'</div>';
+  if(!drOriginOK())return card('<p style="margin:0">A sincronização só funciona quando o app está <b>hospedado num endereço https</b> (ex.: GitHub Pages) — você está abrindo como arquivo local. Depois de hospedar, abra o endereço no PC e no tablet e volte aqui.</p>');
+  const tab=UI.drTab||DR.mode||'github';
+  const tabs='<div class="tabs"><a data-act="driveTab" data-v="github" class="'+(tab==='github'?'on':'')+'">GitHub · não pede login</a><a data-act="driveTab" data-v="drive" class="'+(tab==='drive'?'on':'')+'">Google Drive</a></div>';
+  const cfg=tab==='github'?ghOK():!!DR.cid;
   let b;
-  if(!drOriginOK())b='<p style="margin-top:0">A sincronização com o Google Drive só funciona quando o app está <b>hospedado num endereço https</b> (ex.: GitHub Pages) — você está abrindo como arquivo local. Depois de hospedar, abra o endereço no PC e no tablet e volte aqui.</p>';
-  else if(!DR.cid)b='<p style="margin-top:0">Cole abaixo o <b>ID do cliente OAuth</b> do Google (termina em <code>.apps.googleusercontent.com</code>). Você cria esse ID uma vez, de graça, no Google Cloud.</p><div class="row"><div style="flex:3"><input id="drCid" placeholder="123456789-abc….apps.googleusercontent.com"></div><div class="auto"><button class="btn primary" data-act="driveSaveCid">Salvar e entrar</button></div></div><details style="margin-top:10px"><summary class="small">Como criar o ID (≈10 min)</summary><ol class="small" style="padding-left:18px"><li>Acesse <b>console.cloud.google.com</b> e crie um projeto (ex.: “Método Procuradoria”).</li><li>Em <b>APIs e serviços → Biblioteca</b>, ative a <b>Google Drive API</b>.</li><li>Em <b>Tela de consentimento OAuth</b> (ou “Google Auth Platform”): tipo <b>Externo</b>, informe nome e seu e-mail; em <b>Escopos</b> adicione <code>…/auth/drive.appdata</code>; depois clique em <b>Publicar app</b> (“Em produção”).</li><li>Em <b>Credenciais → Criar credenciais → ID do cliente OAuth</b>: tipo <b>Aplicativo da Web</b>; em <b>Origens JavaScript autorizadas</b> coloque <code>'+esc(location.origin)+'</code> (só o endereço, sem barra no final).</li><li>Copie o <b>ID do cliente</b> e cole acima.</li></ol></details>';
-  else{
-    const st=DR.state;
-    b='<p style="margin-top:0">'+(st==='ok'?'✅ Sincronizado '+ago(DR.last)+'.':st==='sync'?'⏳ Sincronizando…':st==='need'?'⚠ É preciso entrar no Google neste aparelho.':st==='offline'?'📴 Sem conexão — vai sincronizar quando voltar.':st==='error'?'<span class="bad">'+esc(DR.err)+'</span>':'Conectado.')+'</p><p class="small muted">Os dados ficam numa pasta privada do app no seu Google Drive (não aparece na lista de arquivos). Alterações feitas nos dois aparelhos são <b>mescladas</b> automaticamente — a sincronização roda ao abrir o app, alguns segundos depois de cada alteração e a cada poucos minutos.</p><div class="row"><button class="btn primary auto" data-act="'+(st==='need'?'driveConnect':'driveNow')+'">'+(st==='need'?'Entrar no Google':'Sincronizar agora')+'</button><button class="btn auto" data-act="driveLink">🔗 Link para configurar outro aparelho</button><button class="btn auto danger" data-act="driveOff">Desconectar</button></div>';
+  if(cfg&&DR.mode===tab){
+    const need=DR.state==='need';
+    b='<p style="margin-top:0">'+drStatusLine()+'</p><p class="small muted">'+(tab==='github'?'Os dados ficam num arquivo do seu repositório privado <b>'+esc(DR.gh.repo)+'</b>.':'Os dados ficam numa pasta privada do app no seu Google Drive (não aparece na lista de arquivos).')+' Alterações feitas nos dois aparelhos são <b>mescladas</b> automaticamente — a sincronização roda ao abrir o app, alguns segundos depois de cada alteração e a cada poucos minutos.</p><div class="row"><button class="btn primary auto" data-act="'+(need?(tab==='github'?'ghEdit':'driveConnect'):'driveNow')+'">'+(need?(tab==='github'?'Atualizar token':'Entrar no Google'):'Sincronizar agora')+'</button><button class="btn auto" data-act="driveLink">🔗 Link para configurar outro aparelho</button><button class="btn auto danger" data-act="driveOff" data-v="'+tab+'">Desconectar</button></div>';
+  }else if(cfg){
+    b='<p style="margin-top:0">Este modo está configurado, mas <b>não é o que está em uso</b>.</p><div class="row"><button class="btn primary auto" data-act="driveUse" data-v="'+tab+'">Usar este modo</button><button class="btn auto danger" data-act="driveOff" data-v="'+tab+'">Remover</button></div>';
+  }else if(tab==='github'){
+    b='<p style="margin-top:0">Sincroniza por um <b>repositório privado</b> no seu GitHub, com uma chave de acesso salva neste aparelho. <b>Não pede login do Google</b> — depois de configurar, abre e sincroniza direto.</p><div class="row"><div style="flex:2"><label>Repositório (usuario/repositorio)</label><input id="ghRepo" value="'+esc(DR.gh.repo)+'" placeholder="seu-usuario/procuradoria-dados" autocomplete="off"></div><div style="flex:3"><label>Token de acesso</label><input id="ghToken" type="password" placeholder="github_pat_…" autocomplete="off"></div><div class="auto"><button class="btn primary" data-act="ghSave">Salvar e sincronizar</button></div></div>'+(DR.err&&DR.mode==='github'?'<p class="small bad">'+esc(DR.err)+'</p>':'')+'<details style="margin-top:10px"><summary class="small">Como criar o repositório e o token (≈3 min)</summary><ol class="small" style="padding-left:18px"><li>Em <b>github.com/new</b> crie um repositório <b>Private</b> chamado <code>procuradoria-dados</code> (pode ficar vazio).</li><li>Abra <b>github.com/settings/personal-access-tokens/new</b>. Nome: “Método Procuradoria”. Em <b>Expiration</b> escolha o maior prazo (1 ano). Em <b>Repository access</b> marque <b>Only select repositories</b> e escolha <code>procuradoria-dados</code>. Em <b>Permissions → Repository permissions</b>, coloque <b>Contents</b> em <b>Read and write</b>. Clique em <b>Generate token</b> e copie o código (começa com <code>github_pat_</code>).</li><li>Cole o nome do repositório e o token acima. Quando o token expirar, o app avisa e você gera outro.</li></ol></details>';
+  }else{
+    b='<p style="margin-top:0">Cole abaixo o <b>ID do cliente OAuth</b> do Google (termina em <code>.apps.googleusercontent.com</code>). O Google costuma pedir login de novo a cada vez que o app é aberto — por isso o modo GitHub é mais cômodo.</p><div class="row"><div style="flex:3"><input id="drCid" placeholder="123456789-abc….apps.googleusercontent.com"></div><div class="auto"><button class="btn primary" data-act="driveSaveCid">Salvar e entrar</button></div></div><details style="margin-top:10px"><summary class="small">Como criar o ID (≈10 min)</summary><ol class="small" style="padding-left:18px"><li>Acesse <b>console.cloud.google.com</b> e crie um projeto.</li><li>Em <b>APIs e serviços → Biblioteca</b>, ative a <b>Google Drive API</b>.</li><li>Em <b>Google Auth Platform</b>: preencha <b>Branding</b> (nome e e-mails), em <b>Acesso a dados</b> adicione o escopo <code>…/auth/drive.appdata</code> e, em <b>Público</b>, publique o app (ou deixe em teste e adicione seu e-mail como usuário de teste).</li><li>Em <b>Clientes → Criar cliente</b>: <b>Aplicativo da Web</b>; em <b>Origens JavaScript autorizadas</b> coloque <code>'+esc(location.origin)+'</code>.</li><li>Copie o <b>ID do cliente</b> e cole acima.</li></ol></details>';
   }
-  return'<div class="card" style="margin-bottom:14px"><h3>☁️ Sincronização entre aparelhos <small>(Google Drive)</small></h3>'+b+'</div>';
+  return card(tabs+b);
 }
 Object.assign(ACT,{
-  driveSaveCid(){const v=($('#drCid').value||'').trim();if(!/^[\w.-]+\.apps\.googleusercontent\.com$/.test(v)){toast('ID inválido — deve terminar em .apps.googleusercontent.com');return}DR.cid=v;DR.state='need';drStore();render();driveSync(true)},
+  driveTab(el){UI.drTab=el.dataset.v;render()},
+  driveSaveCid(){const v=($('#drCid').value||'').trim();if(!/^[\w.-]+\.apps\.googleusercontent\.com$/.test(v)){toast('ID inválido — deve terminar em .apps.googleusercontent.com');return}DR.cid=v;DR.mode='drive';DR.state='need';drStore();render();driveSync(true)},
+  ghSave(){
+    const repo=($('#ghRepo').value||'').trim().replace(/^https?:\/\/github\.com\//,'').replace(/\.git$/,'').replace(/\/$/,''),tok=($('#ghToken').value||'').trim();
+    if(!/^[\w.-]+\/[\w.-]+$/.test(repo)){toast('Informe o repositório no formato usuario/repositorio');return}
+    if(tok.length<20){toast('Cole o token de acesso do GitHub');return}
+    DR.gh={repo,token:tok};DR.mode='github';DR.state='sync';DR.err='';drStore();render();driveSync(false);
+  },
+  ghEdit(){DR.gh.token='';drStore();DR.state='off';render()},
   driveConnect(){driveSync(true)},
-  driveNow(){driveSync(DR.state==='need')},
-  driveLink(){const u=location.origin+location.pathname+'?cid='+encodeURIComponent(DR.cid);if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(u).then(()=>toast('Link copiado — abra-o no outro aparelho'),()=>prompt('Copie o link:',u));else prompt('Copie o link:',u)},
-  driveOff(){if(!confirm('Desconectar deste aparelho? Os dados na nuvem e neste aparelho continuam; só para de sincronizar.'))return;DR.cid='';DR.token=null;DR.fileId='';DR.state='off';drStore();drChip();render()}
+  driveNow(){driveSync(DR.mode==='drive'&&DR.state==='need')},
+  driveFix(){if(DR.mode==='github'){UI.view='config';UI.drTab='github';render()}else driveSync(true)},
+  driveUse(el){DR.mode=el.dataset.v;DR.err='';DR.state=DR.mode==='drive'?'need':'sync';drStore();render();driveSync(DR.mode==='drive')},
+  driveLink(){
+    let u;
+    if(DR.mode==='github'){if(!confirm('O link contém o token de acesso ao seu repositório de dados. Envie só para você mesmo (e-mail ou mensagem para si) e não compartilhe. Copiar?'))return;u=location.origin+location.pathname+'#gh='+encodeURIComponent(btoa(JSON.stringify({r:DR.gh.repo,t:DR.gh.token})))}
+    else u=location.origin+location.pathname+'?cid='+encodeURIComponent(DR.cid);
+    if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(u).then(()=>toast('Link copiado — abra-o no outro aparelho'),()=>prompt('Copie o link:',u));else prompt('Copie o link:',u);
+  },
+  driveOff(el){
+    const m=(el&&el.dataset&&el.dataset.v)||DR.mode;
+    if(!confirm('Desconectar este modo neste aparelho? Os dados na nuvem e neste aparelho continuam; só para de sincronizar.'))return;
+    if(m==='github')DR.gh={repo:'',token:''};else{DR.cid='';DR.token=null;DR.fileId='';DR.email='';try{localStorage.removeItem(DRTOK)}catch(e){}}
+    if(DR.mode===m){DR.mode='';DR.state='off'}
+    drStore();drChip();render();
+  }
 });
 async function driveInit(){
   drLoad();
-  if(!DR.cid||!drOriginOK()){DR.state='off';drChip();return}
-  DR.state='need';drLoadGis().catch(()=>{});
+  if(!drReady()||!drOriginOK()){DR.state='off';drChip();return}
+  if(DR.mode==='drive'){DR.state='need';drLoadGis().catch(()=>{})}
   await driveSync(false);
 }
-setInterval(()=>{drChip();if(DR.state==='ok'&&document.visibilityState==='visible'&&Date.now()-DR.last>180000)driveSync(false)},60000);
+/* Google: se pediu login, o primeiro toque na tela já abre a janela de entrada (já com a conta lembrada) */
+document.addEventListener('click',()=>{if(DR.mode==='drive'&&DR.state==='need'&&DR.last&&!DR.busy&&!DR.auto){DR.auto=true;toast('Entrando no Google…');driveSync(true)}},true);
+setInterval(()=>{
+  drChip();
+  if(!drReady())return;
+  if(DR.state==='ok'&&document.visibilityState==='visible'&&Date.now()-DR.last>180000)driveSync(false);
+  if(DR.mode==='drive'&&DR.token&&DR.exp-Date.now()<600000&&!DR.busy&&document.visibilityState==='visible')drToken(false).catch(()=>{});
+},60000);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&DR.state==='ok'&&Date.now()-DR.last>30000)driveSync(false)});
-window.addEventListener('online',()=>{if(DR.cid&&DR.state==='offline')driveSync(false)});
+window.addEventListener('online',()=>{if(drReady()&&DR.state==='offline')driveSync(false)});
 
 function applyTheme(){const t=S.settings.tema;document.documentElement.dataset.theme=t==='auto'?(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):t}
 function render(){
