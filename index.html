@@ -926,7 +926,7 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 function fsBanner(){
   if(FS.state==='need')return'<div class="banner">💾 <span style="flex:1"><b>Reconecte o arquivo de dados</b> para carregar e salvar sua versão mais recente.'+(FS.err?' <span class="small">('+esc(FS.err)+')</span>':'')+'</span><button class="btn sm primary" data-act="fsReconnect">Reconectar</button></div>';
   if(FS.state==='error')return'<div class="banner">⚠ <span style="flex:1">'+esc(FS.err)+'</span><button class="btn sm" data-act="nav" data-v="config">Configurações</button></div>';
-  if(FS.state==='none'&&UI.view==='dashboard'&&S.topics.length)return'<div class="banner">💾 <span style="flex:1">Ative o <b>salvamento automático em arquivo</b> para nunca perder dados e abrir sempre a versão mais atual.</span><button class="btn sm primary" data-act="nav" data-v="config">Ativar</button></div>';
+  if(FS.state==='none'&&UI.view==='dashboard'&&S.topics.length&&!drReady())return'<div class="banner">💾 <span style="flex:1">Ative o <b>salvamento automático em arquivo</b> para nunca perder dados e abrir sempre a versão mais atual.</span><button class="btn sm primary" data-act="nav" data-v="config">Ativar</button></div>';
   return'';
 }
 function fsCard(){
